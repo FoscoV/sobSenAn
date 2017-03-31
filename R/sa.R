@@ -2,7 +2,7 @@ if(any(ls() == "SAsobEN")){}else{
 	SAsobEN <-new.env()
 	SAsobEN$.conflicts.OK<-c()
 }
-SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull")))
+SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull","uniform")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull","unif")))
 
 #"exp","geom","t",
 #"exponential","geometric","t"
@@ -90,7 +90,19 @@ SAaddPara<-function(){
 	while(!any(seq(1,length(candidateDdf$distribution))==promptGo)){
 		cat("Which one? \n ")
 		promptGo<-scan(,nmax=1)}
-	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]))
+	if(any(fndPara%%1 != 0)){
+		discretBOOL<-"n"}else{
+			cat(c("Parameters values provided are all integers. Do you have a discrete distribution? \n
+			y \t only integers allowed for this parameter \n
+			n \t continuos values are allowed, just a coincidence \n"))
+			discretBOOL<-scan(,what="text",nmax=1)
+			while(discretBOOL != "y" & discretBOOL != "n"){
+				cat("answer y or n")
+				discretBOOL<-scan(,what="text",nmax=1)
+			}
+		}
+
+	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL)
 	if(any(ls(SAsobEN) == "parDists")){
 		SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
 		SAsobEN$parDists<-npDist
@@ -105,8 +117,12 @@ SAssessDis<-function(fndPara,distrib){
 		return(sharDens)
 	}
 
+	if(distrib!="uniform"){
+		fndDist<-fitdistr(fndPara,distrib)}else{
+		fndDist<-data.frame(estimate=c(min(fndPara),max(fndPara)))
+	}
 
-	fndDist<-fitdistr(fndPara,distrib)
+
 
 	#GoFfndDistr<-chisq.test(fndPara,p=pnorm(fndPara,fndDist$estimate[1],fndDist$estimate[2]),rescale.p=TRUE,simulate.p.value=TRUE)
 	GoFfndDistr<-ks.test(fndPara,as.character(pdist(distrib)),fndDist$estimate[1],fndDist$estimate[2])
@@ -142,7 +158,7 @@ modelRuns<- function(){
 }
 ####adopt a distribution-based deformation of parameter space. Such as a quantile: I'm looking for a (0,1) range!
 SobSeqNew<-function(){
-	SAsobEN$seqSob<-sobol(30000,length(SAsobEN$parDists[,1]),init=TRUE,scrambling=3)
+	SAsobEN$seqSob<-sobol(30000,2*length(SAsobEN$parDists[,1]),init=TRUE,scrambling=3)
 }
 modPar4run<-function(){
 	SobSeqNew()
@@ -152,6 +168,7 @@ modPar4run<-function(){
 		SAsobEN$parSeq<-as.data.frame(SAsobEN$parSeq)
 	}
 	colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
+	SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")]<-round(SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")],digits=0)
 }
 
 
@@ -161,8 +178,8 @@ library(randtoolbox)
 
 biblio2sobol<-function(){
 	parAddBOOT<-function(){
-		SAaddPara()
-		cat("Do you want to provide anotherparameter?\n (y|n) \n")
+		suppressWarnings(SAaddPara())
+		cat("Do you want to provide another parameter?\n (y|n) \n")
 		morPam<-scan(,what="text",nmax=1)
 		while(morPam != "y" & morPam != "n"){
 			cat("answer y or n")
@@ -175,7 +192,7 @@ biblio2sobol<-function(){
 		morPam<-parAddBOOT()
 	}
 	modPar4run()
-	cat(c("Where do you wato to save the file for batch processing for the EXTERNAL MODEL?"))
+	cat(c("Where do you wato to save the file for batch processing the EXTERNAL MODEL?"))
 	write.table(SAsobEN$parSeq,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
 }
 
