@@ -15,6 +15,7 @@ lwrDens<-function(parVal,shapeA1,shapeA2,shapeB1,shapeB2,distrib){
 	denB<-get(distrib)(parVal,shapeB1,shapeB2)
 	pmin(denA,denB)
 }
+library(MASS)
 
 ddist<-function(dist){
 	funa<-paste("d",as.character(SAsobEN$distDict[which(SAsobEN$distDict[,1]==dist),2]),sep="")
@@ -32,6 +33,7 @@ qdist<-function(dist){
 	return(funa)
 	}
 
+library(fitdistrplus)
 SAaddPara<-function(){
 
 	cat(c("Type the name of the parameter which sensitivity you want to analyse: \n"),fill=TRUE)
@@ -62,19 +64,37 @@ SAaddPara<-function(){
 	candidateDdf$singleEffMax<-round(as.numeric(tmpRes[,5]),2)
 ####		c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,meansieff,maxsieff)
 
-	print(candidateDdf[order(candidateDdf$GOFks),])
-#	cat(c(namePara ,"is distributed with a probability aestimed at ",GoFfndDistr$p.value,"% \n each one of the values provided affect the distribution for ", 1- mean(singParEff),"% (mean)\n", 1-max(singParEff),"% (max) \n do you want to save it for further exploration? \n (y|n)"),fill=T)
-#	promptGo<-scan(what="text",nmax=1)
-#	while(promptGo != "y" & promptGo != "n"){
-#		cat("answer y or n \n ")
-#		promptGo<-scan(,what="text",nmax=1)}
-#	if (promptGo == "y"){
-#		npDist<-data.frame(param=namePara,dist="norm",P1=fndDist$estimate[1],P2=fndDist$estimate[2])
-#		if(any(ls(SAsobEN) == "parDists")){
-#			SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
-#			SAsobEN$parDists<-npDist
-#		}
-#	}
+	cat(c(namePara ,"fits the following distribution (defined with the firsts 2 columns). \n
+	 Goodness Of Fit (comparison with Kolmogorov-Smirnov) is shown in the third column. \n
+	 Last Columns are filled with the mean effect of one parameter on the overall distribution and the more sigificant one. \n
+	 Which distribution do you like more? \n (consider the number on left and look at the plot) \n"))
+	print(candidateDdf[order(candidateDdf$singleEffMax),])
+
+#Preparing Plot
+	h<-hist(fndPara,main="Distribution",xlab=namePara)
+	xfit<-seq(min(fndPara),max(fndPara),length=40)
+	brlen<-diff(h$mids[1:2])
+	croma<-rainbow(length(candidateDdf$distribution))
+	legend("topright",legend=candidateDdf$distribution,fill=rainbow(length(candidateDdf$distribution)))
+
+	denplot<-function(xfit,disdat,ord,brlen){
+		yfit<-get(ddist(disdat$distribution[ord]))(xfit,disdat$distPar1[ord],disdat$distPar1[ord])
+		yfit <- yfit*brlen*length(fndPara)
+		lines(xfit, yfit, col=croma[ord], lwd=2)
+}
+
+	denplotBOOT<-function(nume){try(denplot(xfit,candidateDdf,nume,brlen))}
+	lapply(X=seq(1,length(candidateDdf$distribution)),FUN=denplotBOOT)
+
+	promptGo<-scan(,nmax=1)
+	while(!any(seq(1,length(candidateDdf$distribution))==promptGo)){
+		cat("Which one? \n ")
+		promptGo<-scan(,nmax=1)}
+	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]))
+	if(any(ls(SAsobEN) == "parDists")){
+		SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
+		SAsobEN$parDists<-npDist
+	}
 }
 
 SAssessDis<-function(fndPara,distrib){
@@ -106,7 +126,6 @@ SAssessDis<-function(fndPara,distrib){
 	maxsieff <- 1-max(singParEff)
 
 	outDf<-c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,meansieff,maxsieff)
-	#print(outDf)
 	return(outDf)
 }
 
@@ -129,20 +148,36 @@ modPar4run<-function(){
 	SobSeqNew()
 	for(field in seq(1,length(SAsobEN$parDists[,1]))){
 		SAsobEN$parSeq<-SAsobEN$seqSob
-		SAsobEN$parSeq[,field]<-get(paste("q",as.character(SAsobEN$parDists$dist[field]),sep=""))(SAsobEN$seqSob[,field],SAsobEN$parDists$P1[field],SAsobEN$parDists$P2[field])
+		SAsobEN$parSeq[,field]<-get(qdist(SAsobEN$parDists$dist[field]))(SAsobEN$seqSob[,field],as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
 		SAsobEN$parSeq<-as.data.frame(SAsobEN$parSeq)
 	}
+	colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
 }
 
 
 library(randtoolbox)
 
-####print them out to a specific tab separated file  (include compatibility in format with SimLab)
-#### write.csv(fndPara, file=file.choose()) funziona! Andrà usato un write.table con tab comeseparatore di campo e qualche altra impestata opzione per avere l'output formato simlab
 
 
-
-#####prompt user for run the model in batch using the provided parameters set
+biblio2sobol<-function(){
+	parAddBOOT<-function(){
+		SAaddPara()
+		cat("Do you want to provide anotherparameter?\n (y|n) \n")
+		morPam<-scan(,what="text",nmax=1)
+		while(morPam != "y" & morPam != "n"){
+			cat("answer y or n")
+			morPam<-scan(,what="text",nmax=1)
+		}
+	return(morPam)
+	}
+	morPam<-"y"
+	while(morPam =="y"){
+		morPam<-parAddBOOT()
+	}
+	modPar4run()
+	cat(c("Where do you wato to save the file for batch processing for the EXTERNAL MODEL?"))
+	write.table(SAsobEN$parSeq,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
+}
 
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
