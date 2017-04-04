@@ -2,10 +2,10 @@
 \alias{deltDens}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Verify effect of removing a parameter on their effect
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Picks a combination of the parameters provided (one is left out). Than assess the overall similarity in distributions.
 }
 \usage{
 deltDens(combPar)
@@ -33,7 +33,7 @@ deltDens(combPar)
 %%  ~~who you are~~
 }
 \note{
-%%  ~~further notes~~
+It a dummy useless function it simply avoid a for loop
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -42,18 +42,6 @@ deltDens(combPar)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (combPar) 
-{
-    altDist <- fitdistr(scrPara[, combPar], "normal")
-    sharDens <- integrate(lwrDens, -Inf, Inf, fndDist$estimate[1], 
-        fndDist$estimate[2], altDist$estimate[1], altDist$estimate[2])
-    return(as.numeric(substr(sharDens, start = 1, stop = 4)[1]))
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

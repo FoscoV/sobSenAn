@@ -2,10 +2,9 @@
 \alias{SAaddPara}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+It doeas the opeartion required for add a parameter to the interface's dataFrame.
 }
-\description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+\description{Prompt the user, plot the graphs and iterate spome lower routines for assess the distributions.
 }
 \usage{
 SAaddPara()
@@ -42,24 +41,24 @@ SAaddPara()
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function () 
+function ()
 {
-    cat(c("Type the name of the parameter which sensitivity you want to analyse: \n"), 
+    cat(c("Type the name of the parameter which sensitivity you want to analyse: \n"),
         fill = TRUE)
     namePara <- scan(, what = "text")
-    cat(c("Write down the values ", namePara, " may assume.\n (return blank when done)\n"), 
+    cat(c("Write down the values ", namePara, " may assume.\n (return blank when done)\n"),
         fill = TRUE)
     fndPara <- scan()
     fndDist <- fitdistr(fndPara, "normal")
-    GoFfndDistr <- ks.test(fndPara, "pnorm", fndDist$estimate[1], 
+    GoFfndDistr <- ks.test(fndPara, "pnorm", fndDist$estimate[1],
         fndDist$estimate[2])
     scrPara <- combn(fndPara, (length(fndPara) - 1))
-    singParEff <- unlist(lapply(X = seq(1, length(fndPara)), 
+    singParEff <- unlist(lapply(X = seq(1, length(fndPara)),
         FUN = deltDens))
-    cat(c(namePara, "seems normally distributed with a probability aestimed at ", 
-        GoF2fndDistr$p.value, "\% \n each one of the values provided affect the distribution for ", 
-        1 - mean(singParEff), "\% (mean)\n", 1 - max(singParEff), 
-        "\% (max) \n do you want to save it for further exploration? \n (y|n)"), 
+    cat(c(namePara, "seems normally distributed with a probability aestimed at ",
+        GoF2fndDistr$p.value, "\% \n each one of the values provided affect the distribution for ",
+        1 - mean(singParEff), "\% (mean)\n", 1 - max(singParEff),
+        "\% (max) \n do you want to save it for further exploration? \n (y|n)"),
         fill = T)
     promptGo <- scan(what = "text", nmax = 1)
     while (promptGo != "y" & promptGo != "n") {
@@ -67,7 +66,7 @@ function ()
         promptGo <- scan(, what = "text", nmax = 1)
     }
     if (promptGo == "y") {
-        npDist <- data.frame(param = namePara, dist = "norm", 
+        npDist <- data.frame(param = namePara, dist = "norm",
             P1 = fndDist$estimate[1], P2 = fndDist$estimate[2])
         if (any(ls(SAsobEN) == "parDists")) {
             rbind(SAsobEN$parDists, npDist)

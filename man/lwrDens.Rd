@@ -2,7 +2,7 @@
 \alias{lwrDens}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+compare two density function saving the lower of them
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
@@ -39,7 +39,7 @@ lwrDens(parVal, shapeA1, shapeA2, shapeB1, shapeB2)
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+CLEMONS, Traci E.; BRADLEY, Edwin L. A nonparametric measure of the overlapping coefficient. Computational statistics & data analysis, 2000, 34.1: 51-61.
 }
 \author{
 %%  ~~who you are~~
@@ -59,7 +59,7 @@ lwrDens(parVal, shapeA1, shapeA2, shapeB1, shapeB2)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (parVal, shapeA1, shapeA2, shapeB1, shapeB2) 
+function (parVal, shapeA1, shapeA2, shapeB1, shapeB2)
 {
     denA <- dnorm(parVal, shapeA1, shapeA2)
     denB <- dnorm(parVal, shapeB1, shapeB2)

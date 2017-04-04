@@ -1,9 +1,9 @@
 Package: sobSenAn
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Sobol Sensitivity for external models
+Version: 0.99
 Date: 2017-03-27
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Fosco Vesely
+Maintainer: fosco at tana dot it
+Description: convert a bibliographical searches to sensitivity analisys (via batch process in external model or simulations)
+License: GPL2
