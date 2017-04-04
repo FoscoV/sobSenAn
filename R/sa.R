@@ -32,6 +32,11 @@ qdist<-function(dist){
 	class(funa)<-"function"
 	return(funa)
 	}
+rdist<-function(dist){
+	funa<-paste("r",as.character(SAsobEN$distDict[which(SAsobEN$distDict[,1]==dist),2]),sep="")
+	class(funa)<-"function"
+	return(funa)
+	}
 
 library(fitdistrplus)
 SAaddPara<-function(){
@@ -81,15 +86,17 @@ SAaddPara<-function(){
 		yfit<-get(ddist(disdat$distribution[ord]))(xfit,disdat$distPar1[ord],disdat$distPar1[ord])
 		yfit <- yfit*brlen*length(fndPara)
 		lines(xfit, yfit, col=croma[ord], lwd=2)
-}
+	}
 
 	denplotBOOT<-function(nume){try(denplot(xfit,candidateDdf,nume,brlen))}
 	lapply(X=seq(1,length(candidateDdf$distribution)),FUN=denplotBOOT)
 
 	promptGo<-scan(,nmax=1)
 	while(!any(seq(1,length(candidateDdf$distribution))==promptGo)){
-		cat("Which one? \n ")
+		cat("Which one? (number on left) \n ")
 		promptGo<-scan(,nmax=1)}
+
+	##Check for discrete distribution.
 	if(any(fndPara%%1 != 0)){
 		discretBOOL<-"n"}else{
 			cat(c("Parameters values provided are all integers. Do you have a discrete distribution? \n
@@ -101,8 +108,37 @@ SAaddPara<-function(){
 				discretBOOL<-scan(,what="text",nmax=1)
 			}
 		}
+	#check for truncated distribution....this is a mess...
+	cat(c("Does your distribution have a truncation?\n a minimum value and/or a maximum one? \n (y|n) \n"))
+	truncit<-scan(,what="text",nmax=1)
+	while(truncit != "y" & truncit != "n"){
+				cat("answer y or n")
+				truncit<-scan(,what="text",nmax=1)
+	}
+	if(truncit =="y"){
+		cat(c("Do you want to provide \n 1. \t a numeric \n 2. \t a cumulative density \n threshold? \n (1 | 2 ) \n"))
+		thretru<-scan(,nmax=1)
+		while(thretru != 1 & thretru != 2){
+				cat("answer 1 or 2")
+				thretru<-scan(,what="text",nmax=1)
+		}
+		cat(c("Digit the minimum. \n -Inf (case sensitive) for have it open on left \n "))
+		minthr<-scan(,nmax=1)
+		if(thretru == 2 ){
+			minthr<-get(qdist(candidateDdf$distribution[promptGo]))(minthr,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
+		}
+		cat(c("Digit the maximum. \n Inf (case sensitive) for have it open on right \n "))
+		maxthr<-scan(,nmax=1)
+		if(thretru == 2 ){
 
-	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL)
+			maxthr<-get(qdist(candidateDdf$distribution[promptGo]))(maxthr,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
+		}
+	}else{
+		minthr<- -Inf
+		maxthr<- Inf
+	}
+
+	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr)
 	if(any(ls(SAsobEN) == "parDists")){
 		SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
 		SAsobEN$parDists<-npDist
@@ -153,18 +189,36 @@ modelRuns<- function(){
 	runs<- (2^(cu+3)*2(length(SAsobEN$parDists[,1])+2))/length(SAsobEN$parDists[,1])
 	#while(runs >= (2^(cu+3)*2(length(SAsobEN$parDists[,1])+2))/length(SAsobEN$parDists[,1])){
 	#	cu <- cu+1
-		return(5)
+		return(30000)
 	#}
 }
 ####adopt a distribution-based deformation of parameter space. Such as a quantile: I'm looking for a (0,1) range!
-SobSeqNew<-function(){
-	SAsobEN$seqSob<-sobol(30000,2*length(SAsobEN$parDists[,1]),init=TRUE,scrambling=3)
-}
+
 modPar4run<-function(){
-	SobSeqNew()
+
+	#truBOOT<-function(numero,campo){truDist(SAsobEN$parDists$dist[campo],get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),numero)}
+	truBOOT<-function(numero){truDist(SAsobEN$parDists$dist[field],SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field],numero,field)}
+
+	truDist<-function(dista,low,hi,ics,campo){
+	if(ics < hi && ics > low ){
+		return(get(ddist(dista))(ics,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))/(get(pdist(dista))(hi,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))-get(pdist(dista))(low,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))))
+	}else{return(0)}
+}
+
+	#seqSob<-sobol(30000,2*length(SAsobEN$parDists[,1]),init=TRUE,scrambling=3)
+	seqSob<-sobol(30000,length(SAsobEN$parDists[,1]),init=TRUE,scrambling=3)
+	SAsobEN$parSeq<-seqSob
 	for(field in seq(1,length(SAsobEN$parDists[,1]))){
-		SAsobEN$parSeq<-SAsobEN$seqSob
-		SAsobEN$parSeq[,field]<-get(qdist(SAsobEN$parDists$dist[field]))(SAsobEN$seqSob[,field],as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+		if(SAsobEN$parDists$mintrs[field] != -Inf || SAsobEN$parDists$maxtrs[field] != Inf){
+			#in this case we have to find out the truncated distribution
+
+			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(50000,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+			someRandCDF<-subset(someRandCDF,someRandCDF >= SAsobEN$parDists$mintrs[field]&someRandCDF <= SAsobEN$parDists$maxtrs[field])
+			trudy<-edfun(someRandCDF,support=range(c(SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field])),dfun=truBOOT)
+			SAsobEN$parSeq[,field]<-trudy$qfun(SAsobEN$parSeq[,field])
+		}else{
+			SAsobEN$parSeq[,field]<-get(qdist(SAsobEN$parDists$dist[field]))(seqSob[,field],as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+		}
 		SAsobEN$parSeq<-as.data.frame(SAsobEN$parSeq)
 	}
 	colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
@@ -174,6 +228,13 @@ modPar4run<-function(){
 
 library(randtoolbox)
 
+truDist<-function(dista,low,hi,ics){
+	if(ics < hi && ics > low ){
+		return(get(ddist(dista))(ics)/(get(pdist(dista))(hi)-get(pdist(dista))(low)))
+	}else{return(0)}
+}
+
+suppressPackageStartupMessages(library(edfun))
 
 
 biblio2sobol<-function(){
@@ -185,7 +246,7 @@ biblio2sobol<-function(){
 			cat("answer y or n")
 			morPam<-scan(,what="text",nmax=1)
 		}
-	return(morPam)
+		return(morPam)
 	}
 	morPam<-"y"
 	while(morPam =="y"){
@@ -198,3 +259,5 @@ biblio2sobol<-function(){
 
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
+
+
