@@ -2,10 +2,10 @@
 \alias{modelRuns}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-calculation of model runs... it will provide input for sobol sequences generation
+not yet working
 }
 \description{
-Still not working :(
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
 modelRuns()
@@ -47,10 +47,7 @@ function ()
     cu <- 1
     runs <- (2^(cu + 3) * 2(length(SAsobEN$parDists[, 1]) + 2))/length(SAsobEN$parDists[,
         1])
-    while (runs >= (2^(cu + 3) * 2(length(SAsobEN$parDists[,
-        1]) + 2))/length(SAsobEN$parDists[, 1])) {
-        cu <- cu + 1
-    }
+    return(30000)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

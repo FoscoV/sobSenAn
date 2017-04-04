@@ -1,14 +1,14 @@
 \name{lwrDens}
 \alias{lwrDens}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-compare two density function saving the lower of them
+\title{calculates the lower between two distribution for every value required
+
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-lwrDens(parVal, shapeA1, shapeA2, shapeB1, shapeB2)
+lwrDens(parVal, shapeA1, shapeA2, shapeB1, shapeB2, distrib)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,6 +26,9 @@ lwrDens(parVal, shapeA1, shapeA2, shapeB1, shapeB2)
 }
   \item{shapeB2}{
 %%     ~~Describe \code{shapeB2} here~~
+}
+  \item{distrib}{
+%%     ~~Describe \code{distrib} here~~
 }
 }
 \details{
@@ -59,10 +62,10 @@ CLEMONS, Traci E.; BRADLEY, Edwin L. A nonparametric measure of the overlapping 
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (parVal, shapeA1, shapeA2, shapeB1, shapeB2)
+function (parVal, shapeA1, shapeA2, shapeB1, shapeB2, distrib)
 {
-    denA <- dnorm(parVal, shapeA1, shapeA2)
-    denB <- dnorm(parVal, shapeB1, shapeB2)
+    denA <- get(distrib)(parVal, shapeA1, shapeA2)
+    denB <- get(distrib)(parVal, shapeB1, shapeB2)
     pmin(denA, denB)
   }
 }

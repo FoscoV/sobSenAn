@@ -2,7 +2,7 @@
 \alias{SAsobEN}
 \docType{data}
 \title{
-environment for storing some informations
+environment used by many other functions in the package
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
@@ -10,7 +10,7 @@ environment for storing some informations
 \usage{data("SAsobEN")}
 \format{
   The format is:
-<environment: 0x3071ec8>
+<environment: 0x72ebd58>
 }
 \details{
 %%  ~~ If necessary, more details than the __description__ above ~~
