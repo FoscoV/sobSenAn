@@ -103,7 +103,7 @@ SAaddPara<-function(){
 			y \t only integers allowed for this parameter \n
 			n \t continuos values are allowed, just a coincidence \n"))
 			discretBOOL<-scan(,what="text",nmax=1)
-			while(discretBOOL != "y" & discretBOOL != "n"){
+			while(discretBOOL != "y" & discretBOOL != "n" & length(discretBOOL)!=1){
 				cat("answer y or n")
 				discretBOOL<-scan(,what="text",nmax=1)
 			}
@@ -138,7 +138,7 @@ SAaddPara<-function(){
 		maxthr<- Inf
 	}
 
-	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr)
+	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr,origVal=paste(fndPara,collapse=","))
 	if(any(ls(SAsobEN) == "parDists")){
 		SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
 		SAsobEN$parDists<-npDist
@@ -237,7 +237,7 @@ truDist<-function(dista,low,hi,ics){
 suppressPackageStartupMessages(library(edfun))
 
 
-biblio2sobol<-function(){
+biblio2parameter<-function(){
 	parAddBOOT<-function(){
 		suppressWarnings(SAaddPara())
 		cat("Do you want to provide another parameter?\n (y|n) \n")
@@ -252,9 +252,11 @@ biblio2sobol<-function(){
 	while(morPam =="y"){
 		morPam<-parAddBOOT()
 	}
-	modPar4run()
-	cat(c("Where do you wato to save the file for batch processing the EXTERNAL MODEL?"))
-	write.table(SAsobEN$parSeq,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
+	cat(c("Where do you wato to save the file with parameters distribution?"))
+	write.table(SAsobEN$parDists,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
+	#modPar4run()
+	#cat(c("Where do you wato to save the file for batch processing the EXTERNAL MODEL?"))
+	#write.table(SAsobEN$parSeq,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
 }
 
 ####read results from a some kind of files (include compatibility in format with SimLab)
