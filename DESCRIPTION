@@ -6,7 +6,7 @@ Date: 2017-03-27
 Author: Fosco Vesely
 Maintainer: Fosco Vesely <fosco@tana.it>
 Description: convert a bibliographical searches to sensitivity analisys (via batch process in external model or simulations)
-Depends:MASS,fitdistrplus,randtoolbox,edfun
+Depends:MASS,fitdistrplus,randtoolbox,edfun,spartan
 License: GPL2
 Suggests: R.rsp
 VignetteBuilder: R.rsp

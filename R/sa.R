@@ -245,7 +245,7 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
 	#creating a tempdir named... SAfast!
 	dir.create("SAfast")
-	efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
+	efast_generate_sample(FILEPATH="SAfast/",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
 	#I want the samples uniform between 0 and 1 so that they fit CDFs.
 	#Now SAfast is filled with bunnches of files... I'm going to merge them...
 	for(curNum in seq(1,cuRvESAMPLE)){
@@ -339,7 +339,7 @@ output2Sens<-function(resFile,RISULTATO){
 		}
 
 	if(missing(RISULTATO)){
-		print("Name your Analysis OUTPUT filename")
+		print("Name your Analysis OUTPUT.zip filename")
 		RISULTATO<-file.choose()
 	}
 
@@ -367,9 +367,9 @@ output2Sens<-function(resFile,RISULTATO){
 
 	efast_get_overall_medians("SAfast",3,PARAMETERS=as.character(SAsobEN$parDists$param),NUMSAMPLES=SAsobEN$sampleXcur,MEASURES=SIMoutPT)
 
-	efast_run_Analysis("SAfast/",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
+	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
-	zip(paste(RISULTATO,".zip",sep=""),c(paste("SAfast/",as.array(as.character(SIMoutPT)),".pdf",sep=""),"SAfast/SAresults.csv"))
+	zip(paste(RISULTATO,".zip",sep=""),c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep=""),file.path("SAfast","SAresults.csv"))
 
 	unlink("SAfast",recursive=T)
 }
