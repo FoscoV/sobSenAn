@@ -310,7 +310,7 @@ biblio2parameter<-function(straight=FALSE){
 	}
 	SAsobEN$parDists$param<-as.character(SAsobEN$parDists$param)
 	SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
-	if(is.false(straight)){
+	if(!straight){
 		cat(c("Where do you wato to save the file with parameters distribution?"))
 		write.table(SAsobEN$parDists,file=file.choose(),eol = "\r\n" ,sep="\t",row.names=FALSE)
 	}
