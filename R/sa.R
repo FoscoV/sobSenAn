@@ -358,7 +358,7 @@ output2Sens<-function(resFile,RISULTATO){
 			#create in SAfast a file "CurveX_ParameterY_Results.csv"
 			strtprm<-startcurve+paNum*SAsobEN$sampleXcur-SAsobEN$sampleXcur+1
 			ndprm<-startcurve+paNum*SAsobEN$sampleXcur
-			suppressWarnings(write.csv(resFile[strtprm:ndprm,],file=paste("SAfast/","Curve",svolta,"_Parameter",paNum,"_Results.csv",sep=""),row.names=FALSE,col.names=TRUE,quote=FALSE))
+			suppressWarnings(write.csv(resFile[strtprm:ndprm,],file=file.path("SAfast",paste("Curve",svolta,"_Parameter",paNum,"_Results.csv",sep="")),row.names=FALSE,col.names=TRUE,quote=FALSE))
 		}
 	}
 	# check who is the one which is going to be valued...]
@@ -376,4 +376,15 @@ output2Sens<-function(resFile,RISULTATO){
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
 
+saveSensSession<- function(){
+	attach(SAsobEN)
+	save(list=ls(SAsobEN),file=paste(Sys.Date(),".SAd",sep=""))
+	cat(c("Session saved in ",paste(Sys.Date(),".SAd",sep=""),". \n"),fill=TRUE)
+}
+loadSensSession<-function(){
+	cat(c("Select the desired previous session saved \n "),fill=TRUE)
+	oldSensSession<-file.choose()
+	load(file=oldSensSession,envir=SAsobEN)
+	cat(c("Session in loaded \n "),fill=TRUE)
+}
 
