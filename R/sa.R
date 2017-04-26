@@ -369,7 +369,7 @@ output2Sens<-function(resFile,RISULTATO){
 
 	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
-	zip(paste(RISULTATO,".zip",sep=""),c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep=""),file.path("SAfast","SAresults.csv"))
+	zip(paste(RISULTATO,".zip",sep=""),c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
 
 	unlink("SAfast",recursive=T)
 }
