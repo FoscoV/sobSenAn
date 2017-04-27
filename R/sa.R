@@ -103,7 +103,7 @@ SAaddPara<-function(){
 			y \t only integers allowed for this parameter \n
 			n \t continuos values are allowed, just a coincidence \n"))
 			discretBOOL<-scan(,what="text",nmax=1)
-			while(discretBOOL != "y" & discretBOOL != "n" & length(discretBOOL)!=1){
+			while(discretBOOL != "y" & discretBOOL != "n" | length(discretBOOL)!=1){
 				cat("answer y or n")
 				discretBOOL<-scan(,what="text",nmax=1)
 			}
@@ -237,12 +237,7 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 		}else{return(0)}
 	}
 	#Generting samples
-	#but first, adding the dummy parameter!
-	if(any(SAsobEN$parDists$param == "Dummy")){
-		SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
-	}
-	Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
-	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
+
 	#creating a tempdir named... SAfast!
 	dir.create("SAfast")
 	efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
@@ -323,9 +318,18 @@ biblio2eFast<-function(){
 	biblio2parameter(straight=T)
 	#run the script for samples genereation
 	SAsobEN$sampleXcur<-65
+	#but first, adding the dummy parameter!
+	if(any(SAsobEN$parDists$param == "Dummy")){
+		SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
+	}
+	Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
+	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
+	SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
+	#ready to generate!
 	eFap(thickness=SAsobEN$sampleXcur,cuRvESAMPLE=3)
 	#export the samples for external run
-	write.table(SAsobEN$parSeq,sep="\t", file=file.choose(),col.names=TRUE,row.names=FALSE,eol="\r\n",quote=FALSE)
+	write.table(SAsobEN$parSeq,sep="\t", file=file.choose(),col.names=TRUE,row.names=FALSE,quote=FALSE)
+	#sussposing system handle this by himself eol="\r\n",
 }
 
 
@@ -369,7 +373,7 @@ output2Sens<-function(resFile,RISULTATO){
 
 	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
-	zip(paste(RISULTATO,".zip",sep=""),c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
+	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
 
 	unlink("SAfast",recursive=T)
 }
