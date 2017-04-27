@@ -375,7 +375,7 @@ output2Sens<-function(resFile,RISULTATO){
 
 	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
 
-	unlink("SAfast",recursive=T)
+	#unlink("SAfast",recursive=T)
 }
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
