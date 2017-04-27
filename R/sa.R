@@ -245,12 +245,12 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
 	#creating a tempdir named... SAfast!
 	dir.create("SAfast")
-	efast_generate_sample(FILEPATH="SAfast/",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
+	efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
 	#I want the samples uniform between 0 and 1 so that they fit CDFs.
 	#Now SAfast is filled with bunnches of files... I'm going to merge them...
 	for(curNum in seq(1,cuRvESAMPLE)){
 		for(turnPara in SAsobEN$parDists$param){
-			nomeSegmFile<-paste("SAfast/Curve",curNum,"_",turnPara,".csv",sep="")
+			nomeSegmFile<-file.path("SAfast",paste("Curve",curNum,"_",turnPara,".csv",sep=""))
 			print(nomeSegmFile)
 			aSegmPara<-read.csv(nomeSegmFile)
 			if(any(ls(SAsobEN) == "parSeq")){
