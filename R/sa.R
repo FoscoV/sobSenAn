@@ -342,10 +342,7 @@ output2Sens<-function(resFile,RISULTATO){
 		#resFile<-read.csv(resFile)
 		}
 
-	if(missing(RISULTATO)){
-		print("Name your Analysis OUTPUT.zip filename")
-		RISULTATO<-file.choose()
-	}
+
 
 	#imposing 3 resempling curves
 	if(length(resFile[,1])%%3 != 0 ){stop("supposed wrong file, not able to trace the resempling sequences")}
@@ -373,9 +370,13 @@ output2Sens<-function(resFile,RISULTATO){
 
 	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
-	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
+	if(!missing(RISULTATO)){
+		print("Name your Analysis OUTPUT.zip filename")
+		zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
+	}
 
 	#unlink("SAfast",recursive=T)
+	unlink("SAfast/Curve*")
 }
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
