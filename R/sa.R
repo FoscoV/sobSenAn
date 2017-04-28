@@ -134,7 +134,7 @@ SAaddPara<-function(){
 			maxthr<-get(qdist(candidateDdf$distribution[promptGo]))(maxthr,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
 		}
 	}else{
-		#hard-setting a range between 0.1 and 0.9 as default
+		#setting a range between 0.1 and 0.9 as default
 		minthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.1,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
 		maxthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.9,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
 	}
@@ -328,12 +328,16 @@ biblio2eFast<-function(){
 	#ready to generate!
 	eFap(thickness=SAsobEN$sampleXcur,cuRvESAMPLE=3)
 	#export the samples for external run
-	write.table(SAsobEN$parSeq,sep="\t", file=file.choose(),col.names=TRUE,row.names=FALSE,quote=FALSE)
+	fileToWrite<-file.choose()
+	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
 	#sussposing system handle this by himself eol="\r\n",
+	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""))
+	cat(c("Output created!"))
+	SAclean()
 }
 
 
-output2Sens<-function(resFile,RISULTATO){
+output2Sens<-function(resFile,RISULTATO,hyperspace){
 	if(missing(resFile)){
 		#find out a file format for ermes to give back the results, supposing csv
 		resFile<-read.table(file.choose(),sep="\t",header=TRUE)
@@ -341,7 +345,10 @@ output2Sens<-function(resFile,RISULTATO){
 		resFile<-read.table(resFile,sep="\t",header=TRUE)
 		#resFile<-read.csv(resFile)
 		}
-
+	if(missing(hyperspace)){
+		cat(c("Where is the .SAd file related to the explored hyperspace?"))
+		loadSensSession()
+	}
 
 
 	#imposing 3 resempling curves
@@ -391,5 +398,8 @@ loadSensSession<-function(){
 	oldSensSession<-file.choose()
 	load(file=oldSensSession,envir=SAsobEN)
 	cat(c("Session in loaded \n "),fill=TRUE)
+}
+SAclean<-function(){
+	rm(list=ls(SAsobEN),envir=SAsobEN)
 }
 
