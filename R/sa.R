@@ -336,6 +336,20 @@ biblio2eFast<-function(){
 	SAclean()
 }
 
+SAmorSam<-function(sammor){
+	cat(c("Select the desired previous session saved \n "),fill=TRUE)
+	oldSensSession<-file.choose()
+	load(file=oldSensSession,envir=SAsobEN)
+	eFap(thickness=sammor)
+	fileToWrite<-oldSensSession
+	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
+	#sussposing system handle this by himself eol="\r\n",
+	SAsobEN$sampleXcur<-sammor
+	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""))
+	cat(c("Output created!"))
+	SAclean()
+}
+
 
 output2Sens<-function(resFile,RISULTATO,hyperspace){
 	if(missing(resFile)){
