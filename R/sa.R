@@ -345,7 +345,6 @@ SAmorSam<-function(sammor){
 	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
 	#sussposing system handle this by himself eol="\r\n",
 	SAsobEN$sampleXcur<-sammor
-	print(paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""))
 	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""),envir=SAsobEN)
 	cat(c("Output created!"))
 	SAclean()
