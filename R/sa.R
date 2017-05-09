@@ -331,7 +331,7 @@ biblio2eFast<-function(){
 	fileToWrite<-file.choose()
 	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
 	#sussposing system handle this by himself eol="\r\n",
-	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""))
+	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""),envir=SAsobEn)
 	cat(c("Output created!"))
 	SAclean()
 }
@@ -345,7 +345,8 @@ SAmorSam<-function(sammor){
 	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
 	#sussposing system handle this by himself eol="\r\n",
 	SAsobEN$sampleXcur<-sammor
-	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""))
+	print(paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep="")
+	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""),envir=SAsobEN)
 	cat(c("Output created!"))
 	SAclean()
 }
@@ -353,7 +354,7 @@ SAmorSam<-function(sammor){
 
 output2Sens<-function(resFile,RISULTATO,hyperspace){
 	if(missing(resFile)){
-		#find out a file format for ermes to give back the results, supposing csv
+		#find out a file format for ermes to give back the results, supposing tsv
 		resFile<-read.table(file.choose(),sep="\t",header=TRUE)
 	}else{
 		resFile<-read.table(resFile,sep="\t",header=TRUE)
