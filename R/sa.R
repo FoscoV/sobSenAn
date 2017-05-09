@@ -405,7 +405,7 @@ output2Sens<-function(resFile,RISULTATO,hyperspace){
 
 saveSensSession<- function(){
 	attach(SAsobEN)
-	save(list=ls(SAsobEN),file=paste(Sys.Date(),".SAd",sep=""))
+	save(list=ls(SAsobEN),file=paste(Sys.Date(),".SAd",sep=""),envir=SAsobEN)
 	cat(c("Session saved in ",paste(Sys.Date(),".SAd",sep=""),". \n"),fill=TRUE)
 }
 loadSensSession<-function(){
