@@ -1,7 +1,7 @@
 Package: sobSenAn
 Type: Package
 Title: Sobol Sensitivity for external models
-Version: 0.99999
+Version: 0.999999
 Date: 2017-03-27
 Author: Fosco Vesely
 Maintainer: Fosco Vesely <fosco@tana.it>
