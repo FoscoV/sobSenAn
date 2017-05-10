@@ -1,0 +1,155 @@
+%VignetteIndexEntry{foreYield}
+%VignetteEngine{R.rsp::tex}
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{hyperref,xcolor}
+\hypersetup{hidelinks}
+\usepackage{amssymb}
+\usepackage{mdframed}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage[section]{placeins}
+\usepackage{lmodern}
+\usepackage{fourier}
+\usepackage{layaureo}
+\usepackage{listings}
+\lstset{language=R,frame=single,breaklines=true,postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},captionpos=b}
+\usepackage[style=numeric,backend=biber,autolang=hyphen,doi=false, isbn=false, eprint=false]{biblatex}
+\addbibresource{references.bib}
+
+\author{Fosco Mattia Vesely}
+\title{\textsl{sob}ol \textsl{Sen}sitivity \textsl{An}alysis \\ v. $0.99*$}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+\pagebreak
+\section{Introduzione}
+Il pacchetto R \lstinline!sobSenAn! è disegnato per fornire un interfaccia utente interattiva che accompagni l'utilizzatore attraverso i vari passaggi connessi alla stima degli indici si sensitività di un modello ai dati di input.
+Soluzioni simili sono presenti in \lstinline!R! ma richiedono che il modello sia richiamabile dall'interno dello stesso ambiente \lstinline!R!.
+
+
+Il presente documento è destinato ad illustrare all'utente la modalità d'uso del programma. Per chi intendesse vagliare gli aspetti più tecnici si rimanda alla documentazione del pacchetto, disponibile su \href{https://github.com/FoscoV/sobSenAn/}{GitHub}.
+\section{Installazione}
+Disponendo di un ambiente R già installato\footnote{per l'installazione si può fare riferimento al \href{http://cran.r-project.org/}{sito ufficiale del progetto CRAN}} è possibile installare \lstinline!sobSenAn! con i comandi forniti in listing \ref{instR}.
+\begin{lstlisting}[caption={Procedura d'installazione entro R},label=instR]
+install.packages("remotes") # nel caso non sia gia' installato
+library(remotes)
+remotes::install_github("FoscoV/sobSenAn")
+\end{lstlisting}
+Le istruzioni contenute in listing \ref{instR} provvedono automaticamente all'installazione della versione più recente di \lstinline!sobSenAn! (od al suo aggiornamento) e delle relative dipendenze.
+Il pacchetto \lstinline!SobSenAn! è basato su strumenti di analisi dati forniti in altri pacchetti. La struttura del pacchetto anzichè uno script è stata adottata, oltre che per la semplificazione nella gestione delle versioni in vista di futuri aggiornamenti, per la più comoda gestione delle dipendenze.
+
+\section{Utilizzo}
+Il funzionamento del pacchetto è divisibile in parti successive:
+\begin{enumerate}
+\item acquisizione di ciascun parametro (\ref{inputs})
+\item generazione dei valori di input per il modello d'interesse (\ref{printOut})
+\item esecuzione su un modello esterno delle simulazioni secondo i parametri indicati
+\item stima degli indici di sensibilità sulla base dei risultati ottenuti (\ref{sobIdx})
+\end{enumerate}
+Pacchetti \lstinline!R! disponibili per la stima degli indici di sensitività  richiedono la diponibilità di una funzione di classe \lstinline!predict! per l'iterazione di MonteCarlo sui parametri di input. La strutturazione adottata da \lstinline!sobSenAn! genera i dati di input per il modello che li dovrà poi elaborare.
+Gli output del modello saranno poi analizzati da \lstinline!sobSEnAn! per ottenere gli indici. La fase di stima degli indici è quindi asincrona all'esecuzione del modello.
+
+\subsection{Acquisizione dei parametri}
+\label{inputs}
+\lstinline!sobSenAn! contiene l'istruzione \lstinline!biblio2eFast()! che avvia una procedura guidata per l'inserimento dei parametri rinvenuti in bibliografia e di seguito elabora la relativa distribuzione.
+
+Dapprima è richiesto il nome del parametro la cui distribuzione si intende valutare.
+Il nome può essere liberamente attribuito ma non deve essere "Dummy", nè iniziare con una cifra.
+
+Vengono di seguito richiesti i valori disponibili per il parametro\footnote{possono essere inseriti uno alla volta premendo "invio" una volta dopo ciascun inserimento}.
+Qualora durante l'elencazione dei valori avvenga un errore di digitazione può essere cancellato prima di premere invio. Se invio è già stato premuto, il valore è ormai letto dal sistema. Per annullare la digitazione è necessario annullare l'operazione\footnote{\lstinline!Esc! su MSWindows, \lstinline!ctrl+C! su linux} e riprendere digitando \lstinline!biblio2eFast()!. I tratti già inseriti sono già salvati e non devono essere ripetuti. I valori inseriti per l'ultimo parametro (quello  non concluso) sono invece da reinserire.
+
+Premendo "invio" su una linea vuota si conclude la fase di introduzione dei valori e viene richiesto di scegliere  la distribuzione più idonea.
+La scelta è presentata corredata da:
+\begin{description}
+\item[Goodness of Fit] (Kolmogorov-Smirnov) che indica quanto la distribuzione corrisponda ai dati indicati
+\item[Single Effect] che stima l'effetto (medio e massimo) di ciascuno dei parametri forniti nel determinare la distribuzione. Sulla base di questo è stimato quanto un ulteriore parametro possa snaturare la distribuzione (o quanto averne trovato uno di meno avrebbe cambiato l'esito dell'analisi).
+\item[Grafico] un istogramma riporta la frequenza campionaria indicata mentre le linee colorate riportano la densità di probabilità associata alle distribuzioni in valutazione.
+
+\textbf{NB:} La densità di probabilità e la frequenza sono in ultima istanza due misure diverse; il confronto è utile in termini quantitativi ma non applicabile agli aspetti quantitativi.
+\end{description}
+
+Per completezza esplorativa, sono supportate (quindi mostrate) anche distribuzioni che inverosimilmente saranno riscontrate.
+I criteri su cui fondare la scelta della distribuzione più adatta richiedono l'interpretazione dell'utilizzatore.
+
+Scelta la distribuzione, l'iter automatizzato richiede alcune ulteriori informazioni, che richiedono sempre una risposta \lstinline!y|n!.	
+Sono supportate distribuzioni discrete, aventi  cioè numeri interi\footnote{Un esempio potrebbero essere livelli di resistenza ad un patogeno}, qualora sia il caso, rispondere positivamente a questa richiesta.
+
+Distribuzioni troncate possono essere definite (se richiesto) indicando i valori limite delle probabilità associate. Canonicamente le code inferiori alla probabilità $0.1$ e superiori a $0.9$. Alternativamente i punti di troncatura possono essere indicati per il loro valore assoluto: alcuni parametri possono avere un limite inferiore pari a $0$ (non accettando valori nulli e negativi) e privi di un limite superiore.
+Il limite di troncatura può essere indicato in termini di probabilità cumulata di frequenza $[0,1]$ od in termini di valore assoluto $(-Inf,+Inf)$.
+
+In virtù di una sensibilità  di eFAST ai valori estremi della distribuzione dei parametri, sono impiegate le troncature di default a $0.1$ e $0.9$ della curva di distribuzione di probabilità\footnote{si ricordi che una proprietà delle curve di distribuzione è che una probabilità non nulla sia associata a tutti i valori compresi tra $-Inf$inito e $+Inf$inito}.
+
+Qualora si desideri una distribuzione aperta inferiormente, superiormente od entrambe è necessario superare l'attribuzione di default delle troncature e procedere con l'inserimento dei valori $-Inf$ e $+Inf$ per i valori assoluti di troncamento.
+
+
+
+\subsubsection{Concludere l'introduzione dei parametri}
+\label{printOut}
+Rispondendo "n" alla domanda se inserire un ulteriore parametro, si accede all'ultima fase prima dell'esecuzione dei modelli.
+
+All'utilizzatore è richiesto di indicare un file da generare che conterrà una colonna per ciascuno dei parametri introdotti oltre ad una colonna "Dummy" aggiuntiva (requisito per un confronto tra i parametri eseguito entro il programma) che non sarà considerata dal modello di simulazione.
+Il file dovrà essere impiegato come input al modello di simulazione. I risultati andranno aggiunti in una colonna di modo tale che corrispondano alla riga di input con cui sono stati ottenuti.
+Possono essere inserite diverse colonne di risultati che saranno tutte analizzate in funzione dei dati di input (interazioni tra output di simulazioni non sono supportate).
+
+
+%Accanto al file sarà creato un ulteriore file omonimo (ma con estensione .SAd) che è poi necessario per concludere l'analisi dei dati.
+Nella cartella  "Documenti" (windows) o in "./" (linux) sarà creato un file "Hyperspace.SAd" da  utilizzare per la successiva fase di analisi degli output delle simulazioni.
+Il nome del file non è vincolante e può essere modificato. In esso sono contenute tutte le informazioni relative all'iperspazio dei parametri generato.
+Si ricordi che qualora un nuovo iperspazio venga definito, il file verrà sovrascritto.
+
+
+
+\subsubsection{Modificare precedenti sessioni}
+\label{precedSess}
+\paragraph*{Aggiungere parametri}
+Una sessione già conclusa può essere ulteriormente modificata impiegando \lstinline!loadSensSession()! che richiede di indicare il file di salvataggio .SAd che si intente aggiornare. Una volta caricati i dati precedenti, la già considerata funzione \lstinline!biblio2eFast()! consentirà l'inserimento di ulteriori dati e la generazione dei valori esplorativi dell'iperspazio dei parametri.
+
+
+Aggiungere valori dei parametri a parametri già esistenti e completati non è una funzionalità supportata.
+
+\paragraph*{Cambiare il numero di Campioni}
+Diverse fonti\cite{marino2008}\cite{spartan} riportano $65$ come il numero minimo di campionamenti da effettuare su ogni traiettoria di campionamento.
+Questo minimo è quello impiegato di default da \lstinline!sobSenAn!, per effettuare un campionamento più fitto è possibile, una volta conclusa la fase di generazione dei valori impiegare la funzione \lstinline!SAmorSam()! inserendo tra parentesi il numero di campioni che si desidera effettuare.
+La funzione richiede di selezionare il file .SAd relativo ai parametri da indagare. Autonomamente sostituisce il file dei valori per il modello di simulazione e, di conseguenza, aggiorna il file .SAd.
+
+\subsubsection{Sessioni concluse}
+Nel momento in cui viene generato il file con i valori dei parametri ed il file .SAd, la sessione di \lstinline!R! in corso non rimane altrimenti influenzata dall'inserimento avvenuto. Per recuperare i dati si faccia riferimento al paragrafo \ref{precedSess}. Altrimenti è possibile descrivere direttamente un nuovo iperspazio con la già descritta funzione \lstinline!biblio2eFast()!.
+\subsection{Analisi Sensitività}
+\label{sobIdx}
+\lstinline!output2Sens()! provvede autonomamente a tutte le parti di analisi.
+Richiede di indicare il file contenente gli input (e gli output), forniti (ed ottenuti) (d)al modello di simulazione. Richiede quindi di segnalare il file .SAd generato contestualmente ai parametri che si stanno analizzando.
+
+Il formato del file deve essere lo stesso generato in uscita (valori separati da tabulazione con intestazioni di colonna nella prima riga). Il programma provvede autonomamente al riconoscimento dei parametri e dei risultati.
+L'influenza di tutti i parametri viene valutata su tutti i risultati forniti.
+
+Nella cartella SAfast che viene generata in "Documenti" (windows) o in "./" (linux) si trovano "SAresults.csv" contenente gli  indici statistici per ciascun parametro ed un file .pdf per ciascuno parametro analizzato con i relativi grafici.
+
+Il file SAresults.csv contiene,  per ogni risultato le seguenti colonne:
+\begin{description}
+\item[\_Si]Frazione della varianza del risultato spiegata dalla variazione del parametro
+\item[\_Si\_PVal]First Order Sensitivity Index p-value
+\item[\_STi]Frazione della varianza attribuita al parametro ed alle sue interazionei con altri parametri
+\item[\_STi\_PVal]Total Order Effect Index p-value
+\item[\_SCi] Varianza attribuita a tutti gli altri parametri
+\item[\_Si\_CoEff\_of\_Var]t-test tra p-value del Si del parametro e di Dummy
+\item[\_STi\_CoEff\_of\_Var]t-test tra p-value del STi del parametro e di Dummy
+\item[\_Si\_ErrorBar] Errore nella stima del parametro (in base al ricampionamento)
+\item[\_STi\_ErrorBar] Errore nella stima del parametro (in base al ricampionamento)
+\end{description}
+
+\nocite{*}
+\pagebreak
+\printbibliography[heading=bibintoc]
+
+\end{document}
