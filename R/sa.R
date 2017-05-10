@@ -399,6 +399,7 @@ output2Sens<-function(resFile,RISULTATO,hyperspace){
 
 	#unlink("SAfast",recursive=T)
 	unlink("SAfast/Curve*")
+	SAclean()
 }
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
