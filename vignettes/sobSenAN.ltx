@@ -105,7 +105,7 @@ Possono essere inserite diverse colonne di risultati che saranno tutte analizzat
 
 
 %Accanto al file sarà creato un ulteriore file omonimo (ma con estensione .SAd) che è poi necessario per concludere l'analisi dei dati.
-Nella cartella\footnote{Si fa di seguito riferimento alle impostazioni di default. Sono personalizzabili utilizzando l'istruzione \lstinline!setwd("nuovo  percorso predefinito")!}  "Documenti" (windows) o in "\~/" (linux) sarà creato un file "Hyperspace.SAd" da  utilizzare per la successiva fase di analisi degli output delle simulazioni.
+Nella cartella\footnote{Si fa di seguito riferimento alle impostazioni di default. Sono personalizzabili utilizzando l'istruzione \lstinline!setwd("nuovo  percorso predefinito")!}  "Documenti" (windows) o in "$\sim$/" (linux) sarà creato un file "Hyperspace.SAd" da  utilizzare per la successiva fase di analisi degli output delle simulazioni.
 Il nome del file non è vincolante e può essere modificato. In esso sono contenute tutte le informazioni relative all'iperspazio dei parametri generato.
 Si ricordi che qualora un nuovo iperspazio venga definito, il file verrà sovrascritto.
 
@@ -127,6 +127,11 @@ Diverse fonti\cite{marino2008}\cite{spartan} riportano $65$ come il numero minim
 Questo minimo è quello impiegato di default da \lstinline!sobSenAn!, per effettuare un campionamento più fitto è possibile, una volta conclusa la fase di generazione dei valori impiegare la funzione \lstinline!SAmorSam()! inserendo tra parentesi il numero di campioni che si desidera effettuare.
 La funzione richiede di selezionare il file .SAd relativo ai parametri da indagare. Autonomamente sostituisce il file dei valori per il modello di simulazione e, di conseguenza, aggiorna il file .SAd.
 
+\paragraph*{Impiegare una distribuzione non supportata}
+L'impiego di una distribuzione non supportata non è ovviamente supportato. È tuttavia predisposto.
+Poichè il parametro deve essere generato armonicamente agli altri, si consiglia di inserirlo con distribuzione uniforme avente range numerico $[0,1]$. Si noti che tale range numerico dovrà essere esplicitato alla domanda relativa alla troncatura.
+In seguito alla generazione dei parametri, questo potrà essere manualmente modificato nel file di esplorazione dell'iperspazio dei parametri (\ref{printOut}). Il file .SAd non richiede la modifica di questo aspetto.
+
 \paragraph*{Esportare le distribuzioni registrate}
 Dopo avere caricato l'iperspazio d'interesse (\ref{precedSess}) è sufficiente impiegare \lstinline!SAexport()! .
 \subsubsection{Sessioni concluse}
@@ -139,7 +144,7 @@ Richiede di indicare il file contenente gli input (e gli output), forniti (ed ot
 Il formato del file deve essere lo stesso generato in uscita (valori separati da tabulazione con intestazioni di colonna nella prima riga). Il programma provvede autonomamente al riconoscimento dei parametri e dei risultati.
 L'influenza di tutti i parametri viene valutata su tutti i risultati forniti.
 
-Nella cartella SAfast che viene generata in "Documenti" (windows) o in "./" (linux) si trovano "SAresults.csv" contenente gli  indici statistici per ciascun parametro ed un file .pdf per ciascuno parametro analizzato con i relativi grafici.
+Nella cartella SAfast che viene generata in "Documenti" (windows) o in "$\sim$/" (linux) si trovano "SAresults.csv" contenente gli  indici statistici per ciascun parametro ed un file .pdf per ciascuno parametro analizzato con i relativi grafici.
 
 Il file SAresults.csv contiene,  per ogni risultato le seguenti colonne:
 \begin{description}
