@@ -1,8 +1,8 @@
 Package: sobSenAn
 Type: Package
 Title: Sobol Sensitivity for external models
-Version: 0.9999999
-Date: 2017-03-27
+Version: 0.99999999
+Date: 2017-05-11
 Author: Fosco Vesely
 Maintainer: Fosco Vesely <fosco@tana.it>
 Description: convert a bibliographical searches to sensitivity analisys (via batch process in external model or simulations)
