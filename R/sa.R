@@ -157,10 +157,10 @@ SAssessDis<-function(fndPara,distrib){
 		return(sharDens)
 	}
 
-	if(distrib!="uniform"){
-		fndDist<-fitdistr(fndPara,distrib)}else{
+	if(distrib=="uniform"){
 		fndDist<-data.frame(estimate=c(min(fndPara),max(fndPara)))
-	}
+	}else{
+		fndDist<-fitdistr(fndPara,distrib)}
 
 
 
@@ -174,14 +174,18 @@ SAssessDis<-function(fndPara,distrib){
 
 
 	#singParEff<-deltDens(1,"normal")
-	singParEff<-unlist(lapply(X=seq(1,length(fndPara)),FUN=deltDens))
+	singParEff<-try(unlist(lapply(X=seq(1,length(fndPara)),FUN=deltDens)))
 	#singParEff<-unlist(lapply(X=seq(1,length(fndPara)),FUN=deltDens))
 
 
-	meansieff<- 1- mean(singParEff)
-	maxsieff <- 1-max(singParEff)
+	meansieff<- try(1- mean(singParEff))
+	maxsieff <- try(1-max(singParEff))
 
-	outDf<-c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,meansieff,maxsieff)
+	if(distrib=="uniform"){
+		outDf<-c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,NA,NA)
+	}else{
+		outDf<-c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,meansieff,maxsieff)
+	}
 	return(outDf)
 }
 
