@@ -39,12 +39,15 @@ rdist<-function(dist){
 	}
 
 library(fitdistrplus)
-SAaddPara<-function(){
-
-	cat(c("Type the name of the parameter which sensitivity you want to analyse: \n"),fill=TRUE)
-	namePara<-scan(,what="text",nmax=1)
-	cat(c("Write down the values " , namePara, " may assume.\n (return blank when done)\n"),fill=TRUE)
-	fndPara<-scan()
+SAaddPara<-function(namePara,fndPara){
+	if(missing(namePara)){
+		cat(c("Type the name of the parameter which sensitivity you want to analyse: \n"),fill=TRUE)
+		namePara<-scan(,what="text",nmax=1)
+	}
+	if(missing(fndPara)){
+		cat(c("Write down the values " , namePara, " may assume.\n (return blank when done)\n"),fill=TRUE)
+		fndPara<-scan()
+	}
 
 	seekDist<-function(densi){
 		return(suppressWarnings(SAssessDis(fndPara,as.character(densi))))
@@ -69,14 +72,14 @@ SAaddPara<-function(){
 	candidateDdf$singleEffMax<-round(as.numeric(tmpRes[,5]),2)
 ####		c(fndDist$estimate[1],fndDist$estimate[2],GoFfndDistr$p.value,meansieff,maxsieff)
 
-	cat(c(namePara ,"fits the following distribution (defined with the firsts 2 columns). \n
+	cat(c(namePara ,"fits the following distribution (defined by the firsts 2 columns). \n
 	 Goodness Of Fit (comparison with Kolmogorov-Smirnov) is shown in the third column. \n
 	 Last Columns are filled with the mean effect of one parameter on the overall distribution and the more sigificant one. \n
 	 Which distribution do you like more? \n (consider the number on left and look at the plot) \n"))
 	print(candidateDdf[order(candidateDdf$singleEffMax),])
 
 #Preparing Plot
-	h<-hist(fndPara,main="Distribution",xlab=namePara)
+	h<-hist(fndPara,main="Distribution",xlab=namePara)#,freq=FALSE
 	xfit<-seq(min(fndPara),max(fndPara),length=40)
 	brlen<-diff(h$mids[1:2])
 	croma<-rainbow(length(candidateDdf$distribution))
@@ -139,7 +142,7 @@ SAaddPara<-function(){
 		maxthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.9,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
 	}
 
-	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr,origVal=paste(fndPara,collapse=","))
+	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr,origVal=paste(fndPara,collapse=";"))
 	if(any(ls(SAsobEN) == "parDists")){
 		SAsobEN$parDists<-rbind(SAsobEN$parDists,npDist)}else{
 		SAsobEN$parDists<-npDist
@@ -419,3 +422,39 @@ SAclean<-function(){
 	rm(list=ls(SAsobEN),envir=SAsobEN)
 }
 
+SAdelPara<-function(quale){
+	if(missing(quale)){
+		cat(c("Which of the following do you want to delete? \n",as.character(SAsobEN$parDists$param),"\n"))
+		quale<-scan(,what="text",nmax=1)
+	}
+	if(any(SAsobEN$parDists$param==quale)){
+		wrongOne<-which(SAsobEN$parDists$param==quale)
+		SAsobEN$parDists<-SAsobEN$parDists[-wrongOne,]
+		cat(c("Remaing parameters: \n",SAsobEN$parDists$param))
+	}else{
+		cat(c("Unable to find", quale,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))
+	}
+}
+
+SAeditPara<-function(poor){
+	if(missing(poor)){
+		cat(c("Which of the following do you want to detail more than it is? \n",as.character(SAsobEN$parDists$param),"\n"))
+		poor<-scan(,what="text",nmax=1)
+	}
+	if(any(SAsobEN$parDists$param==poor)){
+		shortOne<-which(SAsobEN$parDists$param==poor)
+		oldVal<-as.numeric(unlist(strsplit(as.character(SAsobEN$parDists$origVal[shortOne]),split=";")))
+		cat(c("Write the new values that ",poor," may assume\n"))
+		Valnew<-scan()
+		longerVal<-c(oldVal,Valnew)
+		SAdelPara(poor)
+		suppressWarnings(SAaddPara(poor,longerVal))
+	}else{
+		cat(c("Unable to find", poor,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))
+	}
+}
+SAexport<-function(){
+	cat(c("Point the file where you want the CommaSeparatedValue to be printed"))
+	expoFile<-file.choose()
+	write.csv(SAsobEN$parDists[,c(1,2,3,4,8)],file=expoFile)
+}
