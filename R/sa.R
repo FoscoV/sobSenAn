@@ -466,7 +466,7 @@ SAeditPara<-function(poor){
 		cat(c("Write the new values that ",poor," may assume\n"))
 		Valnew<-scan()
 		longerVal<-c(oldVal,Valnew)
-		SAdelPara(poor)
+		SAdelPara(poor,verba=F)
 		suppressWarnings(SAaddPara(poor,longerVal))
 	}else{
 		cat(c("Unable to find", poor,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))
