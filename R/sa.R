@@ -358,17 +358,19 @@ biblio2eFast<-function(){
 }
 
 SAmorSam<-function(sammor){
-	if(any(ls(SAsobEN)=="parDists")}
+	if(!any(ls(SAsobEN)=="parDists")){
 		cat(c("Select the desired previous session saved \n "),fill=TRUE)
 		oldSensSession<-file.choose()
 		load(file=oldSensSession,envir=SAsobEN)
 	}
 	eFap(thickness=sammor)
-	fileToWrite<-oldSensSession
+	cat("where do you wanto to save your new parameter matrix?\n")
+	fileToWrite<-file.choose()
 	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
 	#sussposing system handle this by himself eol="\r\n",
 	SAsobEN$sampleXcur<-sammor
-	save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""),envir=SAsobEN)
+	#save(list=ls(SAsobEN),file=paste(dirname(fileToWrite),strsplit(fileToWrite,".")[[1]][1],".SAd",sep=""),envir=SAsobEN)
+	save(list=ls(SAsobEN),file="Hyperspace.SAd",envir=SAsobEN)
 	cat(c("Output created!"))
 	SAclean()
 }
@@ -376,6 +378,7 @@ SAmorSam<-function(sammor){
 
 output2Sens<-function(resFile,RISULTATO,hyperspace){
 	if(missing(resFile)){
+		cat(c("where is the output matrix?\n"))
 		#find out a file format for ermes to give back the results, supposing tsv
 		resFile<-read.table(file.choose(),sep="\t",header=TRUE)
 	}else{
