@@ -441,7 +441,7 @@ SAclean<-function(){
 	rm(list=ls(SAsobEN),envir=SAsobEN)
 }
 
-SAdelPara<-function(quale){
+SAdelPara<-function(quale,verba=T){
 	if(missing(quale)){
 		cat(c("Which of the following do you want to delete? \n",as.character(SAsobEN$parDists$param),"\n"))
 		quale<-scan(,what="text",nmax=1)
@@ -449,9 +449,9 @@ SAdelPara<-function(quale){
 	if(any(SAsobEN$parDists$param==quale)){
 		wrongOne<-which(SAsobEN$parDists$param==quale)
 		SAsobEN$parDists<-SAsobEN$parDists[-wrongOne,]
-		cat(c("Remaing parameters: \n",SAsobEN$parDists$param))
+		if(verba){cat(c("Remaing parameters: \n",SAsobEN$parDists$param))}
 	}else{
-		cat(c("Unable to find", quale,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))
+		if(verba){cat(c("Unable to find", quale,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))}
 	}
 }
 
