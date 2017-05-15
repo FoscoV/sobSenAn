@@ -249,6 +249,17 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 			return(get(ddist(dista))(ics,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))/(get(pdist(dista))(hi,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))-get(pdist(dista))(low,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))))
 		}else{return(0)}
 	}
+
+
+	#some handles to the dataFrame...
+		#first, adding the dummy parameter!
+	if(any(SAsobEN$parDists$param == "Dummy")){
+		SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
+	}
+	Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
+	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
+	#sorted (replicable order of parameters)
+	SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
 	#Generting samples
 
 	#creating a tempdir named... SAfast!
@@ -334,13 +345,6 @@ biblio2eFast<-function(){
 	biblio2parameter(straight=T)
 	#run the script for samples genereation
 	SAsobEN$sampleXcur<-65
-	#but first, adding the dummy parameter!
-	if(any(SAsobEN$parDists$param == "Dummy")){
-		SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
-	}
-	Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
-	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
-	SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
 	#ready to generate!
 	eFap(thickness=SAsobEN$sampleXcur,cuRvESAMPLE=3)
 	#export the samples for external run
@@ -354,9 +358,11 @@ biblio2eFast<-function(){
 }
 
 SAmorSam<-function(sammor){
-	cat(c("Select the desired previous session saved \n "),fill=TRUE)
-	oldSensSession<-file.choose()
-	load(file=oldSensSession,envir=SAsobEN)
+	if(any(ls(SAsobEN)=="parDists")}
+		cat(c("Select the desired previous session saved \n "),fill=TRUE)
+		oldSensSession<-file.choose()
+		load(file=oldSensSession,envir=SAsobEN)
+	}
 	eFap(thickness=sammor)
 	fileToWrite<-oldSensSession
 	write.table(SAsobEN$parSeq,sep="\t", file=fileToWrite,col.names=TRUE,row.names=FALSE,quote=FALSE)
