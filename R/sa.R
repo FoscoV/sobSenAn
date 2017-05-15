@@ -137,9 +137,14 @@ SAaddPara<-function(namePara,fndPara){
 			maxthr<-get(qdist(candidateDdf$distribution[promptGo]))(maxthr,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
 		}
 	}else{
-		#setting a range between 0.1 and 0.9 as default
-		minthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.1,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
-		maxthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.9,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
+		if(candidateDdf$distribution[promptGo]!="uniform"){
+			#setting a range between 0.1 and 0.9 as default
+			minthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.1,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
+			maxthr<- get(qdist(candidateDdf$distribution[promptGo]))(0.9,as.numeric(tmpRes[promptGo,1]),as.numeric(tmpRes[promptGo,2]))
+		}else{
+			minthr<-as.numeric(tmpRes[promptGo,1])
+			maxthr<-as.numeric(tmpRes[promptGo,2])
+		}
 	}
 
 	npDist<-data.frame(param=namePara,dist=candidateDdf$distribution[promptGo],P1=as.numeric(tmpRes[promptGo,1]),P2=as.numeric(tmpRes[promptGo,2]),disc=discretBOOL,mintrs=minthr,maxtrs=maxthr,origVal=paste(fndPara,collapse=";"))
@@ -247,13 +252,16 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 
 	#creating a tempdir named... SAfast!
 	dir.create("SAfast")
+	#it may drive to some issues if remained from something previous
+	SAsobEN$parSeq<-NULL
+	#starting from "clean"
 	efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
 	#I want the samples uniform between 0 and 1 so that they fit CDFs.
 	#Now SAfast is filled with bunnches of files... I'm going to merge them...
 	for(curNum in seq(1,cuRvESAMPLE)){
 		for(turnPara in SAsobEN$parDists$param){
 			nomeSegmFile<-file.path("SAfast",paste("Curve",curNum,"_",turnPara,".csv",sep=""))
-			print(nomeSegmFile)
+			#print(nomeSegmFile)
 			aSegmPara<-read.csv(nomeSegmFile)
 			if(any(ls(SAsobEN) == "parSeq")){
 				SAsobEN$parSeq<-rbind(SAsobEN$parSeq,aSegmPara)}else{
@@ -269,7 +277,7 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 		if(SAsobEN$parDists$mintrs[field] != -Inf || SAsobEN$parDists$maxtrs[field] != Inf){
 			#in this case we have to find out the truncated distribution
 
-			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(c(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
 			someRandCDF<-subset(someRandCDF,someRandCDF >= SAsobEN$parDists$mintrs[field]&someRandCDF <= SAsobEN$parDists$maxtrs[field])
 			trudy<-edfun(someRandCDF,support=range(c(SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field])),dfun=truBOOT)
 			SAsobEN$parSeq[,field]<-trudy$qfun(SAsobEN$parSeq[,field])
@@ -462,3 +470,5 @@ SAexport<-function(){
 	expoFile<-file.choose()
 	write.csv(SAsobEN$parDists[,c(1,2,3,4,8)],file=expoFile)
 }
+
+
