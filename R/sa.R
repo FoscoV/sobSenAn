@@ -277,7 +277,7 @@ eFap<-function(thickness=65,cuRvESAMPLE=3){
 		if(SAsobEN$parDists$mintrs[field] != -Inf || SAsobEN$parDists$maxtrs[field] != Inf){
 			#in this case we have to find out the truncated distribution
 
-			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(c(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
 			someRandCDF<-subset(someRandCDF,someRandCDF >= SAsobEN$parDists$mintrs[field]&someRandCDF <= SAsobEN$parDists$maxtrs[field])
 			trudy<-edfun(someRandCDF,support=range(c(SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field])),dfun=truBOOT)
 			SAsobEN$parSeq[,field]<-trudy$qfun(SAsobEN$parSeq[,field])
