@@ -3,7 +3,7 @@ if(any(ls() == "SAsobEN")){}else{
 	SAsobEN$.conflicts.OK<-c()
 }
 SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull","uniform")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull","unif")))
-
+library(nortest)
 #"exp","geom","t",
 #"exponential","geometric","t"
 
@@ -76,6 +76,7 @@ SAaddPara<-function(namePara,fndPara){
 	 Goodness Of Fit (comparison with Kolmogorov-Smirnov) is shown in the third column. \n
 	 Last Columns are filled with the mean effect of one parameter on the overall distribution and the more sigificant one. \n
 	 Which distribution do you like more? \n (consider the number on left and look at the plot) \n"))
+	cat(c("If you were worring: Shapiro-Francia Test resulted: ", sf.test(fndPara)$p.value,"\n \t if >0.5 than it passed the normality test. \n"))
 	print(candidateDdf[order(candidateDdf$singleEffMax),])
 
 #Preparing Plot
@@ -428,7 +429,7 @@ loadSensSession<-function(){
 	cat(c("Select the desired previous session saved \n "),fill=TRUE)
 	oldSensSession<-file.choose()
 	load(file=oldSensSession,envir=SAsobEN)
-	cat(c("Session in loaded \n "),fill=TRUE)
+	cat(c("Session loaded \n "),fill=TRUE)
 }
 SAclean<-function(){
 	rm(list=ls(SAsobEN),envir=SAsobEN)
