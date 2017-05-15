@@ -375,20 +375,40 @@ SAmorSam<-function(sammor){
 	SAclean()
 }
 
+simLabForm<.function(tabellaBuono){
+numColTSV<-as.numeric(scan(,what="integer", n=1,file=tabellaBuono))
+NomiColonne<-scan(,what="text",n=numColTSV,file=tabellaBuono,skip=1)
+read.table(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3),sep="\t",quote=F)
+realDataSimL<-matrix(as.numeric(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3,sep="\t")),ncol=numColTSV,byrow=T)
+realDataSimL<-data.frame(realDataSimL)
+colnames(realDataSimL)<-NomiColonne
+return(realDataSimL)
+}
 
-output2Sens<-function(resFile,RISULTATO,hyperspace){
+
+
+output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 	if(missing(resFile)){
 		cat(c("where is the output matrix?\n"))
 		#find out a file format for ermes to give back the results, supposing tsv
-		resFile<-read.table(file.choose(),sep="\t",header=TRUE)
+		#resFile<-read.table(file.choose(),sep="\t",header=TRUE)
+		resFile<-simLabForm(file.choose())
 	}else{
-		resFile<-read.table(resFile,sep="\t",header=TRUE)
+		resFile<-simLabForm(resFile)
+		#resFile<-read.table(resFile,sep="\t",header=TRUE)
 		#resFile<-read.csv(resFile)
 		}
-	if(missing(hyperspace)){
-		cat(c("Where is the .SAd file related to the explored hyperspace?"))
-		loadSensSession()
+	if(missing(hyperspace)&!any(ls(SAsobEN)=="parDists"){
+		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+		loadSensSession(file.choose())
+	}else{loadSensSession(hyperspace)}
+	if(missing(parametri)){
+		cat(c("Where are the generated parameters?\n"))
+		resFile<-cbind(resFile,read.table(file.choose(),sep="\t",header=TRUE))
+	}else{
+		resFile<-cbind(resFile,read.table(parametri,sep="\t",header=TRUE))
 	}
+
 
 
 	#imposing 3 resempling curves
