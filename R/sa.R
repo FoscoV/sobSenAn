@@ -378,7 +378,6 @@ SAmorSam<-function(sammor){
 simLabForm<-function(tabellaBuono){
 numColTSV<-as.numeric(scan(,what="integer", n=1,file=tabellaBuono))
 NomiColonne<-scan(,what="text",n=numColTSV,file=tabellaBuono,skip=1)
-read.table(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3),sep="\t",quote=F)
 realDataSimL<-matrix(as.numeric(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3,sep="\t")),ncol=numColTSV,byrow=T)
 realDataSimL<-data.frame(realDataSimL)
 colnames(realDataSimL)<-NomiColonne
@@ -401,7 +400,13 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 	if(missing(hyperspace)&!any(ls(SAsobEN)=="parDists")){
 		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
 		loadSensSession(file.choose())
-	}else{loadSensSession(hyperspace)}
+	}else{
+		if(!any(ls(SAsobEN)=="parDists")){
+			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			loadSensSession(hyperspace)
+		}
+
+	}
 	if(missing(parametri)){
 		cat(c("Where are the generated parameters?\n"))
 		resFile<-cbind(resFile,read.table(file.choose(),sep="\t",header=TRUE))
@@ -442,13 +447,16 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 		zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
 	}
 
+	covarianceResPar<-correlate(resFile)
+	network_plot(covarianceResPar)
+
 	#unlink("SAfast",recursive=T)
 	unlink("SAfast/Curve*")
 	SAclean()
 }
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
-
+library(corrr)
 saveSensSession<- function(){
 	attach(SAsobEN)
 	save(list=ls(SAsobEN),file=paste(Sys.Date(),".SAd",sep=""),envir=SAsobEN)
