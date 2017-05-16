@@ -398,7 +398,7 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 		#resFile<-read.table(resFile,sep="\t",header=TRUE)
 		#resFile<-read.csv(resFile)
 		}
-	if(missing(hyperspace)&!any(ls(SAsobEN)=="parDists"){
+	if(missing(hyperspace)&!any(ls(SAsobEN)=="parDists")){
 		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
 		loadSensSession(file.choose())
 	}else{loadSensSession(hyperspace)}
