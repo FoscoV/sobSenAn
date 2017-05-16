@@ -400,7 +400,7 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 	if(!any(ls(SAsobEN)=="parDists")){
 		if(missing(hyperspace)){
 			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-			loadSensSession(file.choose())
+			loadSensSession()
 		}else{
 			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
 			loadSensSession(hyperspace)
