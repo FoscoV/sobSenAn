@@ -375,7 +375,7 @@ SAmorSam<-function(sammor){
 	SAclean()
 }
 
-simLabForm<.function(tabellaBuono){
+simLabForm<-function(tabellaBuono){
 numColTSV<-as.numeric(scan(,what="integer", n=1,file=tabellaBuono))
 NomiColonne<-scan(,what="text",n=numColTSV,file=tabellaBuono,skip=1)
 read.table(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3),sep="\t",quote=F)
