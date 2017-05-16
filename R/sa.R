@@ -396,16 +396,15 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 		resFile<-simLabForm(resFile)
 		#resFile<-read.table(resFile,sep="\t",header=TRUE)
 		#resFile<-read.csv(resFile)
-		}
-	if(missing(hyperspace)&!any(ls(SAsobEN)=="parDists")){
-		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-		loadSensSession(file.choose())
-	}else{
-		if(!any(ls(SAsobEN)=="parDists")){
+	}
+	if(!any(ls(SAsobEN)=="parDists")){
+		if(missing(hyperspace)){
+			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			loadSensSession(file.choose())
+		}else{
 			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
 			loadSensSession(hyperspace)
 		}
-
 	}
 	if(missing(parametri)){
 		cat(c("Where are the generated parameters?\n"))
@@ -466,7 +465,7 @@ loadSensSession<-function(){
 	cat(c("Select the desired previous session saved \n "),fill=TRUE)
 	oldSensSession<-file.choose()
 	load(file=oldSensSession,envir=SAsobEN)
-	cat(c("Session loaded \n "),fill=TRUE)
+	cat(c("Session ",basename(oldSensSession)," loaded \n "),fill=TRUE)
 }
 SAclean<-function(){
 	rm(list=ls(SAsobEN),envir=SAsobEN)
@@ -480,7 +479,7 @@ SAdelPara<-function(quale,verba=T){
 	if(any(SAsobEN$parDists$param==quale)){
 		wrongOne<-which(SAsobEN$parDists$param==quale)
 		SAsobEN$parDists<-SAsobEN$parDists[-wrongOne,]
-		if(verba){cat(c("Remaing parameters: \n",SAsobEN$parDists$param))}
+		if(verba){cat(c("Remaing parameters: \n",SAsobEN$parDists$param,"\n"))}
 	}else{
 		if(verba){cat(c("Unable to find", quale,".\n Did you mean one of the following? \n",as.character(SAsobEN$parDists$param),"\n"))}
 	}
@@ -504,7 +503,7 @@ SAeditPara<-function(poor){
 	}
 }
 SAexport<-function(){
-	cat(c("Point the file where you want the CommaSeparatedValue to be printed"))
+	cat(c("Point the file where you want the CommaSeparatedValue to be printed\n"))
 	expoFile<-file.choose()
 	write.csv(SAsobEN$parDists[,c(1,2,3,4,8)],file=expoFile)
 }
