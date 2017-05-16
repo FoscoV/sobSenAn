@@ -378,7 +378,7 @@ SAmorSam<-function(sammor){
 simLabForm<-function(tabellaBuono){
 numColTSV<-as.numeric(scan(,what="integer", n=1,file=tabellaBuono))
 NomiColonne<-scan(,what="text",n=numColTSV,file=tabellaBuono,skip=1)
-realDataSimL<-matrix(as.numeric(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3,sep="\t")),ncol=numColTSV,byrow=T)
+realDataSimL<-matrix(as.numeric(scan(,what="numeric",file=tabellaBuono,skip=numColTSV+3,strip.white=T,skipNul=T)),ncol=numColTSV,byrow=T)
 realDataSimL<-data.frame(realDataSimL)
 colnames(realDataSimL)<-NomiColonne
 return(realDataSimL)
@@ -386,7 +386,7 @@ return(realDataSimL)
 
 
 
-output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
+output2Sens<-function(resFile,hyperspace,parametri){
 	if(missing(resFile)){
 		cat(c("where is the output matrix?\n"))
 		#find out a file format for ermes to give back the results, supposing tsv
@@ -397,20 +397,20 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 		#resFile<-read.table(resFile,sep="\t",header=TRUE)
 		#resFile<-read.csv(resFile)
 	}
-	if(!any(ls(SAsobEN)=="parDists")){
-		if(missing(hyperspace)){
-			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-			loadSensSession()
-		}else{
-			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-			loadSensSession(hyperspace)
-		}
+
+	if(missing(hyperspace)){
+		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+		loadSensSession()
+	}else{
+		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+		loadSensSession(hyperspace)
 	}
+
 	if(missing(parametri)){
 		cat(c("Where are the generated parameters?\n"))
-		resFile<-cbind(resFile,read.table(file.choose(),sep="\t",header=TRUE))
+		resFile<-cbind(read.table(file.choose(),sep="\t",header=TRUE),resFile)
 	}else{
-		resFile<-cbind(resFile,read.table(parametri,sep="\t",header=TRUE))
+		resFile<-cbind(read.table(parametri,sep="\t",header=TRUE),resFile)
 	}
 
 
@@ -441,10 +441,10 @@ output2Sens<-function(resFile,RISULTATO,hyperspace,parametri){
 
 	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
-	if(!missing(RISULTATO)){
-		print("Name your Analysis OUTPUT.zip filename")
-		zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
-	}
+	#if(!missing(RISULTATO)){
+	#	print("Name your Analysis OUTPUT.zip filename")
+	#	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
+	#}
 
 	covarianceResPar<-correlate(resFile)
 	network_plot(covarianceResPar)
@@ -461,9 +461,11 @@ saveSensSession<- function(){
 	save(list=ls(SAsobEN),file=paste(Sys.Date(),".SAd",sep=""),envir=SAsobEN)
 	cat(c("Session saved in ",paste(Sys.Date(),".SAd",sep=""),". \n"),fill=TRUE)
 }
-loadSensSession<-function(){
+loadSensSession<-function(oldSensSession){
 	cat(c("Select the desired previous session saved \n "),fill=TRUE)
-	oldSensSession<-file.choose()
+	if(missing(oldSensSession)){
+		oldSensSession<-file.choose()
+	}
 	load(file=oldSensSession,envir=SAsobEN)
 	cat(c("Session ",basename(oldSensSession)," loaded \n "),fill=TRUE)
 }
