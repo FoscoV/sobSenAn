@@ -386,7 +386,7 @@ return(realDataSimL)
 
 
 
-output2Sens<-function(resFile,hyperspace,parametri){
+output2Sens<-function(SamNum=65,resFile,hyperspace,parametri){
 	if(missing(resFile)){
 		cat(c("where is the output matrix?\n"))
 		#find out a file format for ermes to give back the results, supposing tsv
@@ -398,20 +398,26 @@ output2Sens<-function(resFile,hyperspace,parametri){
 		#resFile<-read.csv(resFile)
 	}
 
-	if(missing(hyperspace)){
-		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-		loadSensSession()
-	}else{
-		cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-		loadSensSession(hyperspace)
+	if(missing(SamNum)){
+		if(missing(hyperspace)){
+			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			loadSensSession()
+		}else{
+			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			loadSensSession(hyperspace)
+		}
+		SamNum<-SAsobEN$sampleXcur
 	}
 
 	if(missing(parametri)){
 		cat(c("Where are the generated parameters?\n"))
-		resFile<-cbind(read.table(file.choose(),sep="\t",header=TRUE),resFile)
+		traitsMatr<-read.table(file.choose(),sep="\t",header=TRUE)
+		resFile<-cbind(traitsMatr,resFile)
 	}else{
-		resFile<-cbind(read.table(parametri,sep="\t",header=TRUE),resFile)
+		traitsMatr<-read.table(parametri,sep="\t",header=TRUE)
+		resFile<-cbind(traitsMatr,resFile)
 	}
+
 
 
 
@@ -426,28 +432,29 @@ output2Sens<-function(resFile,hyperspace,parametri){
 		#define last item in current curve
 		startcurve<-curvRad*(svolta-1)
 	#for each parameter
-		for(paNum in seq(1,length(SAsobEN$parDists[,1]))){
+		for(paNum in seq(1,length(names(traitsMatr)))){
 			#create in SAfast a file "CurveX_ParameterY_Results.csv"
-			strtprm<-startcurve+paNum*SAsobEN$sampleXcur-SAsobEN$sampleXcur+1
-			ndprm<-startcurve+paNum*SAsobEN$sampleXcur
+			strtprm<-startcurve+paNum*SamNum-SamNum+1
+			ndprm<-startcurve+paNum*SamNum
 			suppressWarnings(write.csv(resFile[strtprm:ndprm,],file=file.path("SAfast",paste("Curve",svolta,"_Parameter",paNum,"_Results.csv",sep="")),row.names=FALSE,col.names=TRUE,quote=FALSE))
 		}
 	}
 	# check who is the one which is going to be valued...]
-	SIMoutPT<-setdiff(names(resFile),as.character(SAsobEN$parDists$param))
+	SIMoutPT<-setdiff(names(resFile),names(traitsMatr))
 	#starting eFAST result analysis:
 
-	efast_get_overall_medians("SAfast",3,PARAMETERS=as.character(SAsobEN$parDists$param),NUMSAMPLES=SAsobEN$sampleXcur,MEASURES=SIMoutPT)
+	efast_get_overall_medians("SAfast",3,PARAMETERS=names(traitsMatr),NUMSAMPLES=SamNum,MEASURES=SIMoutPT)
 
-	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=SAsobEN$parDists$param,NUMCURVES=3,NUMSAMPLES=as.numeric(SAsobEN$sampleXcur),OUTPUTMEASURES_TO_TTEST=1,TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
+	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=names(traitsMatr),NUMCURVES=3,NUMSAMPLES=as.numeric(SamNum),OUTPUTMEASURES_TO_TTEST=1:length(names(traitsMatr)),TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
 
 	#if(!missing(RISULTATO)){
 	#	print("Name your Analysis OUTPUT.zip filename")
 	#	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
 	#}
 
-	covarianceResPar<-correlate(resFile)
-	network_plot(covarianceResPar)
+	try(covarianceResPar<-correlate(resFile),silent=T)
+	try(network_plot(covarianceResPar),silent=T)
+
 
 	#unlink("SAfast",recursive=T)
 	unlink("SAfast/Curve*")
