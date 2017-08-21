@@ -2,7 +2,7 @@ if(any(ls() == "SAsobEN")){}else{
 	SAsobEN <-new.env()
 	SAsobEN$.conflicts.OK<-c()
 }
-SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull","uniform")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull","unif")))
+SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull","uniform","beta")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull","unif","beta")))
 library(nortest)
 #"exp","geom","t",
 #"exponential","geometric","t"
