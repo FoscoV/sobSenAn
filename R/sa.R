@@ -157,7 +157,15 @@ SAaddPara<-function(namePara,fndPara){
 
 SAssessDis<-function(fndPara,distrib){
 	deltDens<-function(combPar,distriba=as.character(distrib)){
+		if(distrib!="beta"){
 		altDist <- fitdistr(scrPara[,combPar],distriba)
+			}else{
+				alfa<-mean(scrPara[,combPar])*(((mean(scrPara[,combPar])*(1-mean(scrPara[,combPar])))/var(scrPara[,combPar]))-1)
+				beto<-(1-mean(scrPara[,combPar]))*(((mean(scrPara[,combPar])*(1-mean(scrPara[,combPar])))/var(scrPara[,combPar]))-1)
+				#fndDist<-fitdistr(scrPara[,combPar],distriba,list(shape1=alfa,shape2=beto))
+				altDist<-fitdistr(scrPara[,combPar],distriba,list(shape1=alfa,shape2=beto))
+				#altDist <- fitdistr(scrPara[,combPar],distriba)
+
 		sharDens<-integrate(lwrDens,-Inf,Inf,fndDist$estimate[1],fndDist$estimate[2],altDist$estimate[1],altDist$estimate[2],ddist(distriba))$value
 #		return(as.numeric(substr(sharDens,start=1,stop=4)[1]))
 		return(sharDens)
@@ -169,7 +177,7 @@ SAssessDis<-function(fndPara,distrib){
 	if(distrib=="beta"){
 			alfa<-mean(fndPara)*(((mean(fndPara)*(1-mean(fndPara)))/var(fndPara))-1)
 			beto<-(1-mean(fndPara))*(((mean(fndPara)*(1-mean(fndPara)))/var(fndPara))-1)
-			fndDist<-fitDistr(fndPara,distrib,list(shape1=alfa,shape2=beto))
+			fndDist<-fitdistr(fndPara,distrib,list(shape1=alfa,shape2=beto))
 		}else{
 		fndDist<-fitdistr(fndPara,distrib)}
 
