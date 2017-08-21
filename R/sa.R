@@ -165,7 +165,7 @@ SAssessDis<-function(fndPara,distrib){
 				#fndDist<-fitdistr(scrPara[,combPar],distriba,list(shape1=alfa,shape2=beto))
 				altDist<-fitdistr(scrPara[,combPar],distriba,list(shape1=alfa,shape2=beto))
 				#altDist <- fitdistr(scrPara[,combPar],distriba)
-
+			}
 		sharDens<-integrate(lwrDens,-Inf,Inf,fndDist$estimate[1],fndDist$estimate[2],altDist$estimate[1],altDist$estimate[2],ddist(distriba))$value
 #		return(as.numeric(substr(sharDens,start=1,stop=4)[1]))
 		return(sharDens)
