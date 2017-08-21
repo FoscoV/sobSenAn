@@ -76,7 +76,7 @@ SAaddPara<-function(namePara,fndPara){
 	 Goodness Of Fit (comparison with Kolmogorov-Smirnov) is shown in the third column. \n
 	 Last Columns are filled with the mean effect of one parameter on the overall distribution and the more sigificant one. \n
 	 Which distribution do you like more? \n (consider the number on left and look at the plot) \n"))
-	cat(c("If you were worring: Shapiro-Francia Test resulted: ", sf.test(fndPara)$p.value,"\n \t if >0.5 than it passed the normality test. \n"))
+	cat(c("If you were worring: Shapiro-Francia Test resulted: ", round(sf.test(fndPara)$p.value,3),"\n \t if >0.5 than it passed the normality test. \n"))
 	print(candidateDdf[order(candidateDdf$singleEffMax),])
 
 #Preparing Plot
