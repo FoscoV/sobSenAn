@@ -165,8 +165,8 @@ SAssessDis<-function(fndPara,distrib){
 
 	if(distrib=="uniform"){
 		fndDist<-data.frame(estimate=c(min(fndPara),max(fndPara)))
-	}else{
-		if(distrib=="beta"){
+		}
+	if(distrib=="beta"){
 			alfa<-mean(fndPara)*(((mean(fndPara)*(1-mean(fndPara)))/var(fndPara))-1)
 			beto<-(1-mean(fndPara))*(((mean(fndPara)*(1-mean(fndPara)))/var(fndPara))-1)
 			fndDist<-fitDistr(fndPara,distrib,list(shape1=alfa,shape2=beto))
