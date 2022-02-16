@@ -251,70 +251,74 @@ modPar4run<-function(){
 	colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
 	SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")]<-round(SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")],digits=0)
 }
-library(spartan)
-eFap<-function(thickness=65,cuRvESAMPLE=3){
+# library(spartan)
 
-	#truBOOT<-function(numero,campo){truDist(SAsobEN$parDists$dist[campo],get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),numero)}
-	truBOOT<-function(numero){truDist(SAsobEN$parDists$dist[field],SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field],numero,field)}
-
-	truDist<-function(dista,low,hi,ics,campo){
-		if(ics < hi && ics > low ){
-			return(get(ddist(dista))(ics,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))/(get(pdist(dista))(hi,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))-get(pdist(dista))(low,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))))
-		}else{return(0)}
-	}
-
-
-	#some handles to the dataFrame...
-		#first, adding the dummy parameter!
-	if(any(SAsobEN$parDists$param == "Dummy")){
-		SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
-	}
-	Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
-	SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
-	#sorted (replicable order of parameters)
-	SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
-	#Generting samples
-
-	#creating a tempdir named... SAfast!
-	dir.create("SAfast")
-	#it may drive to some issues if remained from something previous
-	SAsobEN$parSeq<-NULL
-	#starting from "clean"
-	efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
-	#I want the samples uniform between 0 and 1 so that they fit CDFs.
-	#Now SAfast is filled with bunnches of files... I'm going to merge them...
-	for(curNum in seq(1,cuRvESAMPLE)){
-		for(turnPara in SAsobEN$parDists$param){
-			nomeSegmFile<-file.path("SAfast",paste("Curve",curNum,"_",turnPara,".csv",sep=""))
-			#print(nomeSegmFile)
-			aSegmPara<-read.csv(nomeSegmFile)
-			if(any(ls(SAsobEN) == "parSeq")){
-				SAsobEN$parSeq<-rbind(SAsobEN$parSeq,aSegmPara)}else{
-				SAsobEN$parSeq<-aSegmPara
-			}
-		}
-	}
-	#Burning after read
-	unlink("SAfast",recursive=T)
-
-	#adapting parameters to their own distribution
-	for(field in seq(1,length(SAsobEN$parDists[,1]))){
-		if(SAsobEN$parDists$mintrs[field] != -Inf || SAsobEN$parDists$maxtrs[field] != Inf){
-			#in this case we have to find out the truncated distribution
-
-			someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
-			someRandCDF<-subset(someRandCDF,someRandCDF >= SAsobEN$parDists$mintrs[field]&someRandCDF <= SAsobEN$parDists$maxtrs[field])
-			trudy<-edfun(someRandCDF,support=range(c(SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field])),dfun=truBOOT)
-			SAsobEN$parSeq[,field]<-trudy$qfun(SAsobEN$parSeq[,field])
-		}else{
-			SAsobEN$parSeq[,field]<-get(qdist(SAsobEN$parDists$dist[field]))(SAsobEN$parSeq[,field],as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
-		}
-		SAsobEN$parSeq<-as.data.frame(SAsobEN$parSeq)
-	}
-	colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
-	SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")]<-round(SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")],digits=0)
-
+eFap<-function(){
+	cat("spartan library was removed. Up to now the requested operation (efast sampling) is not available")
 }
+# eFap<-function(thickness=65,cuRvESAMPLE=3){
+
+	# #truBOOT<-function(numero,campo){truDist(SAsobEN$parDists$dist[campo],get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),get(qdist(SAsobEN$parDists$dist[campo]))(SAsobEN$parDists$mintrs[campo],as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo])),numero)}
+	# truBOOT<-function(numero){truDist(SAsobEN$parDists$dist[field],SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field],numero,field)}
+
+	# truDist<-function(dista,low,hi,ics,campo){
+		# if(ics < hi && ics > low ){
+			# return(get(ddist(dista))(ics,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))/(get(pdist(dista))(hi,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))-get(pdist(dista))(low,as.numeric(SAsobEN$parDists$P1[campo]),as.numeric(SAsobEN$parDists$P2[campo]))))
+		# }else{return(0)}
+	# }
+
+
+	# #some handles to the dataFrame...
+		# #first, adding the dummy parameter!
+	# if(any(SAsobEN$parDists$param == "Dummy")){
+		# SAsobEN$parDists<-SAsobEN$parDists[-which(SAsobEN$parDists$param == "Dummy"),]
+	# }
+	# Scemo<-data.frame(param="Dummy",dist="uniform",P1=0,P2=1,disc="n",mintrs=0,maxtrs=1,origVal="0,1")
+	# SAsobEN$parDists<-rbind(SAsobEN$parDists,Scemo)
+	# #sorted (replicable order of parameters)
+	# SAsobEN$parDists<-SAsobEN$parDists[order((SAsobEN$parDists$param)),]
+	# #Generting samples
+
+	# #creating a tempdir named... SAfast!
+	# dir.create("SAfast")
+	# #it may drive to some issues if remained from something previous
+	# SAsobEN$parSeq<-NULL
+	# #starting from "clean"
+	# efast_generate_sample(FILEPATH="SAfast",NUMCURVES=cuRvESAMPLE,NUMSAMPLES=thickness,PARAMETERS=SAsobEN$parDists$param,PMIN=rep(0,length(SAsobEN$parDists$param)),PMAX=rep(1,length(SAsobEN$parDists$param)))
+	# #I want the samples uniform between 0 and 1 so that they fit CDFs.
+	# #Now SAfast is filled with bunnches of files... I'm going to merge them...
+	# for(curNum in seq(1,cuRvESAMPLE)){
+		# for(turnPara in SAsobEN$parDists$param){
+			# nomeSegmFile<-file.path("SAfast",paste("Curve",curNum,"_",turnPara,".csv",sep=""))
+			# #print(nomeSegmFile)
+			# aSegmPara<-read.csv(nomeSegmFile)
+			# if(any(ls(SAsobEN) == "parSeq")){
+				# SAsobEN$parSeq<-rbind(SAsobEN$parSeq,aSegmPara)}else{
+				# SAsobEN$parSeq<-aSegmPara
+			# }
+		# }
+	# }
+	# #Burning after read
+	# unlink("SAfast",recursive=T)
+
+	# #adapting parameters to their own distribution
+	# for(field in seq(1,length(SAsobEN$parDists[,1]))){
+		# if(SAsobEN$parDists$mintrs[field] != -Inf || SAsobEN$parDists$maxtrs[field] != Inf){
+			# #in this case we have to find out the truncated distribution
+
+			# someRandCDF<-get(rdist(SAsobEN$parDists$dist[field]))(thickness*15,as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+			# someRandCDF<-subset(someRandCDF,someRandCDF >= SAsobEN$parDists$mintrs[field]&someRandCDF <= SAsobEN$parDists$maxtrs[field])
+			# trudy<-edfun(someRandCDF,support=range(c(SAsobEN$parDists$mintrs[field],SAsobEN$parDists$maxtrs[field])),dfun=truBOOT)
+			# SAsobEN$parSeq[,field]<-trudy$qfun(SAsobEN$parSeq[,field])
+		# }else{
+			# SAsobEN$parSeq[,field]<-get(qdist(SAsobEN$parDists$dist[field]))(SAsobEN$parSeq[,field],as.numeric(SAsobEN$parDists$P1[field]),as.numeric(SAsobEN$parDists$P2[field]))
+		# }
+		# SAsobEN$parSeq<-as.data.frame(SAsobEN$parSeq)
+	# }
+	# colnames(SAsobEN$parSeq)<-as.character(SAsobEN$parDists$param)
+	# SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")]<-round(SAsobEN$parSeq[,which(SAsobEN$parDists$disc == "y")],digits=0)
+
+# }
 
 
 library(randtoolbox)
@@ -325,7 +329,6 @@ truDist<-function(dista,low,hi,ics){
 	}else{return(0)}
 }
 
-suppressPackageStartupMessages(library(edfun))
 
 
 biblio2parameter<-function(straight=FALSE){
@@ -399,80 +402,80 @@ return(realDataSimL)
 
 
 
-output2Sens<-function(SamNum=65,resFile,hyperspace,parametri){
-	if(missing(resFile)){
-		cat(c("where is the output matrix?\n"))
-		#find out a file format for ermes to give back the results, supposing tsv
-		#resFile<-read.table(file.choose(),sep="\t",header=TRUE)
-		resFile<-simLabForm(file.choose())
-	}else{
-		resFile<-simLabForm(resFile)
-		#resFile<-read.table(resFile,sep="\t",header=TRUE)
-		#resFile<-read.csv(resFile)
-	}
+# output2Sens<-function(SamNum=65,resFile,hyperspace,parametri){
+	# if(missing(resFile)){
+		# cat(c("where is the output matrix?\n"))
+		# #find out a file format for ermes to give back the results, supposing tsv
+		# #resFile<-read.table(file.choose(),sep="\t",header=TRUE)
+		# resFile<-simLabForm(file.choose())
+	# }else{
+		# resFile<-simLabForm(resFile)
+		# #resFile<-read.table(resFile,sep="\t",header=TRUE)
+		# #resFile<-read.csv(resFile)
+	# }
 
-	if(missing(SamNum)){
-		if(missing(hyperspace)){
-			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-			loadSensSession()
-		}else{
-			cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
-			loadSensSession(hyperspace)
-		}
-		SamNum<-SAsobEN$sampleXcur
-	}
+	# if(missing(SamNum)){
+		# if(missing(hyperspace)){
+			# cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			# loadSensSession()
+		# }else{
+			# cat(c("Where is the .SAd file related to the explored hyperspace?\n"))
+			# loadSensSession(hyperspace)
+		# }
+		# SamNum<-SAsobEN$sampleXcur
+	# }
 
-	if(missing(parametri)){
-		cat(c("Where are the generated parameters?\n"))
-		traitsMatr<-read.table(file.choose(),sep="\t",header=TRUE)
-		resFile<-cbind(traitsMatr,resFile)
-	}else{
-		traitsMatr<-read.table(parametri,sep="\t",header=TRUE)
-		resFile<-cbind(traitsMatr,resFile)
-	}
-
-
+	# if(missing(parametri)){
+		# cat(c("Where are the generated parameters?\n"))
+		# traitsMatr<-read.table(file.choose(),sep="\t",header=TRUE)
+		# resFile<-cbind(traitsMatr,resFile)
+	# }else{
+		# traitsMatr<-read.table(parametri,sep="\t",header=TRUE)
+		# resFile<-cbind(traitsMatr,resFile)
+	# }
 
 
-	#imposing 3 resempling curves
-	if(length(resFile[,1])%%3 != 0 ){stop("supposed wrong file, not able to trace the resempling sequences")}
-
-	#going to split the output file into the results...
-	dir.create("SAfast")
-	curvRad<-length(resFile[,1])/3
-	#for each curve resampled ... 3 is hard-set...
-	for(svolta in seq(1,3)){
-		#define last item in current curve
-		startcurve<-curvRad*(svolta-1)
-	#for each parameter
-		for(paNum in seq(1,length(names(traitsMatr)))){
-			#create in SAfast a file "CurveX_ParameterY_Results.csv"
-			strtprm<-startcurve+paNum*SamNum-SamNum+1
-			ndprm<-startcurve+paNum*SamNum
-			suppressWarnings(write.csv(resFile[strtprm:ndprm,],file=file.path("SAfast",paste("Curve",svolta,"_Parameter",paNum,"_Results.csv",sep="")),row.names=FALSE,col.names=TRUE,quote=FALSE))
-		}
-	}
-	# check who is the one which is going to be valued...]
-	SIMoutPT<-setdiff(names(resFile),names(traitsMatr))
-	#starting eFAST result analysis:
-
-	efast_get_overall_medians("SAfast",3,PARAMETERS=names(traitsMatr),NUMSAMPLES=SamNum,MEASURES=SIMoutPT)
-
-	efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=names(traitsMatr),NUMCURVES=3,NUMSAMPLES=as.numeric(SamNum),OUTPUTMEASURES_TO_TTEST=1:length(names(traitsMatr)),TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
-
-	#if(!missing(RISULTATO)){
-	#	print("Name your Analysis OUTPUT.zip filename")
-	#	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
-	#}
-
-	try(covarianceResPar<-correlate(resFile),silent=T)
-	try(network_plot(covarianceResPar),silent=T)
 
 
-	#unlink("SAfast",recursive=T)
-	unlink("SAfast/Curve*")
-	SAclean()
-}
+	# #imposing 3 resempling curves
+	# if(length(resFile[,1])%%3 != 0 ){stop("supposed wrong file, not able to trace the resempling sequences")}
+
+	# #going to split the output file into the results...
+	# dir.create("SAfast")
+	# curvRad<-length(resFile[,1])/3
+	# #for each curve resampled ... 3 is hard-set...
+	# for(svolta in seq(1,3)){
+		# #define last item in current curve
+		# startcurve<-curvRad*(svolta-1)
+	# #for each parameter
+		# for(paNum in seq(1,length(names(traitsMatr)))){
+			# #create in SAfast a file "CurveX_ParameterY_Results.csv"
+			# strtprm<-startcurve+paNum*SamNum-SamNum+1
+			# ndprm<-startcurve+paNum*SamNum
+			# suppressWarnings(write.csv(resFile[strtprm:ndprm,],file=file.path("SAfast",paste("Curve",svolta,"_Parameter",paNum,"_Results.csv",sep="")),row.names=FALSE,col.names=TRUE,quote=FALSE))
+		# }
+	# }
+	# # check who is the one which is going to be valued...]
+	# SIMoutPT<-setdiff(names(resFile),names(traitsMatr))
+	# #starting eFAST result analysis:
+
+	# efast_get_overall_medians("SAfast",3,PARAMETERS=names(traitsMatr),NUMSAMPLES=SamNum,MEASURES=SIMoutPT)
+
+	# efast_run_Analysis("SAfast",MEASURES=as.array(as.character(SIMoutPT)),PARAMETERS=names(traitsMatr),NUMCURVES=3,NUMSAMPLES=as.numeric(SamNum),OUTPUTMEASURES_TO_TTEST=1:length(names(traitsMatr)),TTEST_CONF_INT=0.95,GRAPH_FLAG=T,EFASTRESULTFILENAME="SAresults.csv")
+
+	# #if(!missing(RISULTATO)){
+	# #	print("Name your Analysis OUTPUT.zip filename")
+	# #	zip(RISULTATO,c(file.path("SAfast",paste(as.array(as.character(SIMoutPT)),".pdf",sep="")),file.path("SAfast","SAresults.csv")))
+	# #}
+
+	# try(covarianceResPar<-correlate(resFile),silent=T)
+	# try(network_plot(covarianceResPar),silent=T)
+
+
+	# #unlink("SAfast",recursive=T)
+	# unlink("SAfast/Curve*")
+	# SAclean()
+# }
 ####read results from a some kind of files (include compatibility in format with SimLab)
 ####variance studies.... here I'll have to study deeper!
 library(corrr)
@@ -491,6 +494,9 @@ loadSensSession<-function(oldSensSession){
 }
 SAclean<-function(){
 	rm(list=ls(SAsobEN),envir=SAsobEN)
+	SAsobEN <-new.env()
+	SAsobEN$.conflicts.OK<-c()
+	SAsobEN$distDict<-data.frame("mass"=as.character(c("cauchy","gamma","lognormal","logistic","negative binomial","normal","weibull","uniform","beta")),"stat"=as.character(c("cauchy","gamma","lnorm","logis","nbinom","norm","weibull","unif","beta")))
 }
 
 SAdelPara<-function(quale,verba=T){
