@@ -26,6 +26,8 @@
 \usepackage[style=numeric,backend=biber,autolang=hyphen,doi=false, isbn=false, eprint=false]{biblatex}
 \addbibresource{references.bib}
 
+\usepackage{tcolorbox}
+
 \author{Fosco Mattia Vesely}
 \title{\textsl{sob}ol \textsl{Sen}sitivity \textsl{An}alysis}
 \date{}
@@ -80,6 +82,7 @@ La scelta è presentata corredata da:
 \textbf{NB:} La densità di probabilità e la frequenza sono in ultima istanza due misure diverse; il confronto è utile in termini quantitativi ma non applicabile agli aspetti quantitativi.
 \end{description}
 
+
 Per completezza esplorativa, sono supportate (quindi mostrate) anche distribuzioni che inverosimilmente saranno riscontrate.
 I criteri su cui fondare la scelta della distribuzione più adatta richiedono l'interpretazione dell'utilizzatore.
 
@@ -97,6 +100,13 @@ Qualora si desideri una distribuzione aperta inferiormente, superiormente od ent
 
 \subsubsection{Concludere l'introduzione dei parametri}
 \label{printOut}
+
+\framebox{
+Version 2.0 doesn't support the efast sampling generation due to removal of \href{https://cran.r-project.org/web/packages/spartan/}{spartan library}
+
+}
+\vspace{12pt}
+
 Rispondendo "n" alla domanda se inserire un ulteriore parametro, si accede all'ultima fase prima dell'esecuzione dei modelli.
 
 All'utilizzatore è richiesto di indicare un file da generare che conterrà una colonna per ciascuno dei parametri introdotti oltre ad una colonna "Dummy" aggiuntiva (requisito per un confronto tra i parametri eseguito entro il programma) che non sarà considerata dal modello di simulazione.
